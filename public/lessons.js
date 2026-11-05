@@ -4,14 +4,18 @@
  * Copyright (C) 2026 Dragoş Iorgulescu
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
- * Progression (37 Total Auto-Verified Tasks):
- *   Kata 1: White Belt  — Survival & Escapes (Sessions & Client-Server) [6 Tasks]
- *   Kata 2: Blue Belt   — Guard Work & Spatial Control (Panes & Windows) [6 Tasks]
- *   Kata 3: Purple Belt — Flow State, Vi Buffers & Keybinding Modifiers (~/.tmux.conf) [6 Tasks]
- *   Kata 4: Brown Belt  — Customizing Your Gi (Status Bar Ricing, Colors, Modifiers & Live Telemetry) [6 Tasks]
- *   Kata 5: Black Belt  — Team Ops, Shared Sockets & Automation (Multi-User & Scripting) [6 Tasks]
- *   Kata 6: Coral Belt  — Invisible Jiu-Jitsu (Popups, Event Hooks & Pane Surgery) [5 Tasks]
- *   Kata 7: Red Belt    — The Art of Effortlessness (Idempotent Architecture & The Grandmaster's Vault) [2 Tasks]
+ * Progression (11 Total Belts — 4 UNIX Foundations Youth Belts + 7 BJJ Adult/Master Belts = 50 Auto-Verified Tasks):
+ *   Foundation 1: Grey Belt   — The UNIX Anatomy (Filesystem Architecture: Linux vs. Windows & macOS) [3 Tasks]
+ *   Foundation 2: Yellow Belt — Gatekeepers of the Dojo (Permissions: chmod & chown) [3 Tasks]
+ *   Foundation 3: Orange Belt — Text Fu & Log Hunting (Pipes |, grep, sed & /var/log) [3 Tasks]
+ *   Foundation 4: Green Belt  — System Vitals & Process Control (ps, top/htop, Signals & Why Tmux Exists) [4 Tasks]
+ *   Kata 1: White Belt        — Survival & Escapes (Sessions & Client-Server) [6 Tasks]
+ *   Kata 2: Blue Belt         — Guard Work & Spatial Control (Panes & Windows) [6 Tasks]
+ *   Kata 3: Purple Belt       — Flow State, Vi Buffers & Keybinding Modifiers (~/.tmux.conf) [6 Tasks]
+ *   Kata 4: Brown Belt        — Customizing Your Gi (Status Bar Ricing, Colors, Modifiers & Live Telemetry) [6 Tasks]
+ *   Kata 5: Black Belt        — Team Ops, Shared Sockets & Automation (Multi-User & Scripting) [6 Tasks]
+ *   Kata 6: Coral Belt        — Invisible Jiu-Jitsu (Popups, Event Hooks & Pane Surgery) [5 Tasks]
+ *   Kata 7: Red Belt          — The Art of Effortlessness (Idempotent Architecture & The Grandmaster's Vault) [2 Tasks]
  */
 
 const TMUX_DOJO_THEMES = {
@@ -220,6 +224,225 @@ const MASTER_CHEATSHEET_ITEMS = [
 window.MASTER_CHEATSHEET_ITEMS = MASTER_CHEATSHEET_ITEMS;
 
 const TMUX_DOJO_KATAS = [
+    // ========================================================================
+    // ⬜⬛ FOUNDATION 1: GREY BELT — The UNIX Anatomy (3 Tasks)
+    // ========================================================================
+    {
+        id: "foundation-1-grey-belt",
+        track: "foundations",
+        number: "FOUNDATION 01",
+        belt: "Grey Belt",
+        beltColor: "grey",
+        title: "The UNIX Anatomy (Filesystem Architecture: Linux vs. Windows & macOS)",
+        theory: `
+            <p>
+                <em>Theory Focus:</em> Before stepping onto the <code>tmux</code> mat, every practitioner must understand
+                the arena itself: the UNIX filesystem.
+            </p>
+            <div class="theory-callout">
+                <div class="theory-callout-title">1. No Drive Letters (<code>C:\\</code> vs <code>/</code>)</div>
+                <p>
+                    Windows splits storage into separate drive letters (<code>C:\\</code>, <code>D:\\</code>) using backslashes (<code>\\</code>).
+                    UNIX, Linux, and macOS use a <strong>Single Unified Tree</strong> starting at the Root directory (<code>/</code>)
+                    with forward slashes, mounting disks seamlessly as folders inside that single hierarchy.
+                </p>
+            </div>
+            <div class="theory-callout">
+                <div class="theory-callout-title">2. macOS vs. Linux &amp; "Everything is a File"</div>
+                <ul class="theory-keylist">
+                    <li><span><code>/home/&lt;user&gt;</code> &amp; <code>/root</code></span> <span>User homes (macOS uses <code>/Users/&lt;name&gt;</code>)</span></li>
+                    <li><span><code>/bin</code> &amp; <code>/usr/bin</code></span> <span>Essential command binaries (<code>ls</code>, <code>tmux</code>, <code>htop</code>)</span></li>
+                    <li><span><code>/etc</code></span> <span>System-wide plain-text configuration files (<code>/etc/motd</code>, <code>/etc/passwd</code>)</span></li>
+                    <li><span><code>/var/log</code> &amp; <code>/tmp</code></span> <span>System logs (<code>/var/log</code>) and volatile files/sockets (<code>/tmp</code>)</span></li>
+                    <li><span><code>/dev</code> &amp; <code>/proc</code></span> <span>Hardware devices (<code>/dev/ttyS0</code>) &amp; live kernel telemetry (<code>/proc/cpuinfo</code>) exposed as files!</span></li>
+                </ul>
+            </div>
+        `,
+        tasks: [
+            {
+                id: "f1-t1-root-tree",
+                description: "<strong>Explore the Root Tree (<code>/</code>):</strong> Navigate to the root of the filesystem (<code>cd /</code>) and list all top-level system directories into <code>/tmp/root_tree.txt</code> (<code>ls / &gt; /tmp/root_tree.txt</code>).",
+                hint: "Run <code>ls / &gt; /tmp/root_tree.txt</code> in your terminal.",
+                checkCmd: 'grep -q "etc" /tmp/root_tree.txt 2>/dev/null && grep -q "var" /tmp/root_tree.txt && echo OK',
+                autoSolveCmd: 'ls / > /tmp/root_tree.txt'
+            },
+            {
+                id: "f1-t2-proc-cpuinfo",
+                description: "<strong>Inspect the Virtual Kernel Filesystem (<code>/proc</code>):</strong> Prove that \"everything is a file\" by reading your live CPU model directly from the kernel's virtual <code>/proc/cpuinfo</code> file and saving it to <code>/tmp/cpu.txt</code> (<code>cat /proc/cpuinfo &gt; /tmp/cpu.txt</code>).",
+                hint: "Run <code>cat /proc/cpuinfo &gt; /tmp/cpu.txt</code>.",
+                checkCmd: '[ -s /tmp/cpu.txt ] && grep -qi "processor" /tmp/cpu.txt 2>/dev/null && echo OK',
+                autoSolveCmd: 'cat /proc/cpuinfo > /tmp/cpu.txt'
+            },
+            {
+                id: "f1-t3-nano-motd",
+                description: "<strong>Surviving <code>nano</code> in <code>/etc</code>:</strong> System configs live in <code>/etc</code>. Open <code>/etc/motd</code> (Message of the Day) using <code>nano /etc/motd</code>, write <code>Welcome to the Dojo</code>, save (<kbd>Ctrl+o</kbd>, <kbd>Enter</kbd>), and exit (<kbd>Ctrl+x</kbd>).",
+                hint: "Run <code>nano /etc/motd</code>, type <code>Welcome to the Dojo</code>, press <kbd>Ctrl+o</kbd> then <kbd>Enter</kbd> to save, and <kbd>Ctrl+x</kbd> to exit (or run <code>echo \"Welcome to the Dojo\" &gt; /etc/motd</code>).",
+                checkCmd: 'grep -qi "Welcome to the Dojo" /etc/motd 2>/dev/null && echo OK',
+                autoSolveCmd: 'echo "Welcome to the Dojo" > /etc/motd'
+            }
+        ]
+    },
+
+    // ========================================================================
+    // 🟨 FOUNDATION 2: YELLOW BELT — Gatekeepers of the Dojo (3 Tasks)
+    // ========================================================================
+    {
+        id: "foundation-2-yellow-belt",
+        track: "foundations",
+        number: "FOUNDATION 02",
+        belt: "Yellow Belt",
+        beltColor: "yellow",
+        title: "Gatekeepers of the Dojo (Permissions: chmod & chown)",
+        theory: `
+            <p>
+                <em>Theory Focus:</em> Every file, directory, and UNIX socket has an <strong>Owner (User)</strong>, a
+                <strong>Group</strong>, and <strong>Others (World)</strong>, each governed by three permission bits:
+                <strong>Read (<code>r</code> = 4)</strong>, <strong>Write (<code>w</code> = 2)</strong>, and <strong>Execute (<code>x</code> = 1)</strong>.
+            </p>
+            <div class="theory-callout">
+                <div class="theory-callout-title">Decoding <code>ls -l</code> (<code>-rwxr-x---</code>) &amp; Octal Modes</div>
+                <ul class="theory-keylist">
+                    <li><span><code>chmod 600 file</code> (<code>-rw-------</code>)</span> <span>Owner read/write (4+2=6); zero access for Group &amp; Others</span></li>
+                    <li><span><code>chmod 755 script.sh</code> / <code>chmod +x</code></span> <span>Executable script (<code>rwxr-xr-x</code>)</span></li>
+                    <li><span><code>chown teammate:devops dir</code></span> <span>Transfer Owner to <code>teammate</code> and Group to <code>devops</code></span></li>
+                    <li><span><code>chmod 770 dir</code> (<code>drwxrwx---</code>)</span> <span>Full Owner + Group collaboration; locked to outsiders</span></li>
+                </ul>
+            </div>
+        `,
+        tasks: [
+            {
+                id: "f2-t1-chmod-600",
+                description: "<strong>Lock Down a Secret Key (<code>chmod 600</code>):</strong> Create <code>/tmp/secret.key</code> (<code>touch /tmp/secret.key</code>) and restrict its permissions with <code>chmod 600 /tmp/secret.key</code> so ONLY the owner can read or write it (<code>-rw-------</code>).",
+                hint: "Run <code>touch /tmp/secret.key &amp;&amp; chmod 600 /tmp/secret.key</code>.",
+                checkCmd: '[ "$(stat -c \'%a\' /tmp/secret.key 2>/dev/null)" = "600" ] && echo OK',
+                autoSolveCmd: 'touch /tmp/secret.key && chmod 600 /tmp/secret.key'
+            },
+            {
+                id: "f2-t2-chmod-exec",
+                description: "<strong>Forge an Executable Script (<code>chmod +x</code> / <code>755</code>):</strong> Create <code>/tmp/strike.sh</code> containing <code>#!/bin/sh</code> and <code>echo \"OSS\"</code>, then grant it execution permissions (<code>chmod +x /tmp/strike.sh</code> or <code>chmod 755 /tmp/strike.sh</code>).",
+                hint: "Run <code>printf '#!/bin/sh\\necho \"OSS\"\\n' &gt; /tmp/strike.sh &amp;&amp; chmod +x /tmp/strike.sh</code>.",
+                checkCmd: '[ -x /tmp/strike.sh ] && echo OK',
+                autoSolveCmd: 'printf "#!/bin/sh\\necho OSS\\n" > /tmp/strike.sh && chmod 755 /tmp/strike.sh'
+            },
+            {
+                id: "f2-t3-chown-teammate",
+                description: "<strong>Transfer Ownership to a Teammate (<code>chown</code>):</strong> Create a shared directory <code>/tmp/team_mat</code> (<code>mkdir -p /tmp/team_mat</code>), change its ownership to user <code>teammate</code> and group <code>devops</code> (<code>chown teammate:devops /tmp/team_mat</code>), and set group read/write/execute permissions (<code>chmod 770 /tmp/team_mat</code>).",
+                hint: "Run <code>mkdir -p /tmp/team_mat &amp;&amp; chown teammate:devops /tmp/team_mat &amp;&amp; chmod 770 /tmp/team_mat</code>.",
+                checkCmd: '[ "$(stat -c \'%U:%G:%a\' /tmp/team_mat 2>/dev/null)" = "teammate:devops:770" ] && echo OK',
+                autoSolveCmd: 'mkdir -p /tmp/team_mat && chown teammate:devops /tmp/team_mat && chmod 770 /tmp/team_mat'
+            }
+        ]
+    },
+
+    // ========================================================================
+    // 🟧 FOUNDATION 3: ORANGE BELT — Text Fu & Log Hunting (3 Tasks)
+    // ========================================================================
+    {
+        id: "foundation-3-orange-belt",
+        track: "foundations",
+        number: "FOUNDATION 03",
+        belt: "Orange Belt",
+        beltColor: "orange",
+        title: "Text Fu & Log Hunting (Pipes |, grep, sed & /var/log)",
+        theory: `
+            <p>
+                <em>Theory Focus:</em> Instead of giant monolithic programs, UNIX chains small, sharp tools together
+                using the <strong>Pipe (<code>|</code>)</strong>: the <code>stdout</code> of command A flows directly into the
+                <code>stdin</code> of command B.
+            </p>
+            <div class="theory-callout">
+                <div class="theory-callout-title">Log Hunting Arsenal (<code>/var/log</code>)</div>
+                <ul class="theory-keylist">
+                    <li><span><code>grep "PATTERN" /var/log/dojo-auth.log</code></span> <span>Filter matching lines (<code>-i</code> ignore case, <code>-v</code> invert)</span></li>
+                    <li><span><code>cmd1 | cmd2 &gt; file</code></span> <span>Pipe output of <code>cmd1</code> into <code>cmd2</code> and redirect to <code>file</code></span></li>
+                    <li><span><code>sed -i 's/old/new/g' file</code></span> <span>In-place stream find-and-replace across an entire file</span></li>
+                </ul>
+            </div>
+        `,
+        tasks: [
+            {
+                id: "f3-t1-grep-failed",
+                description: "<strong>Hunt Intruders in <code>/var/log</code> with <code>grep</code>:</strong> Inspect <code>/var/log/dojo-auth.log</code>. Use <code>grep</code> to extract only the lines containing <code>FAILED_LOGIN</code> and redirect them into <code>/tmp/alerts.log</code> (<code>grep \"FAILED_LOGIN\" /var/log/dojo-auth.log &gt; /tmp/alerts.log</code>).",
+                hint: "Run <code>grep \"FAILED_LOGIN\" /var/log/dojo-auth.log &gt; /tmp/alerts.log</code>.",
+                checkCmd: '[ -s /tmp/alerts.log ] && grep -q "FAILED_LOGIN" /tmp/alerts.log && ! grep -q "ACCEPTED_LOGIN" /tmp/alerts.log && echo OK',
+                autoSolveCmd: 'grep "FAILED_LOGIN" /var/log/dojo-auth.log > /tmp/alerts.log'
+            },
+            {
+                id: "f3-t2-pipe-wc",
+                description: "<strong>Chain Commands with Pipes (<code>|</code>):</strong> Pipe <code>/var/log/dojo-auth.log</code> through <code>grep \"FAILED_LOGIN\"</code> and then into <code>wc -l</code> (line count) to write the exact number of failed login attempts into <code>/tmp/fail_count.txt</code> (<code>grep \"FAILED_LOGIN\" /var/log/dojo-auth.log | wc -l &gt; /tmp/fail_count.txt</code>).",
+                hint: "Run <code>grep \"FAILED_LOGIN\" /var/log/dojo-auth.log | wc -l &gt; /tmp/fail_count.txt</code>.",
+                checkCmd: '[ "$(tr -d \' \' < /tmp/fail_count.txt 2>/dev/null)" = "3" ] && echo OK',
+                autoSolveCmd: 'grep "FAILED_LOGIN" /var/log/dojo-auth.log | wc -l > /tmp/fail_count.txt'
+            },
+            {
+                id: "f3-t3-sed-redact",
+                description: "<strong>Sanitize Logs with <code>sed</code> (Stream Editor):</strong> The IP address <code>10.0.0.99</code> in <code>/tmp/alerts.log</code> needs to be anonymized before sharing. Use <code>sed</code> to replace all occurrences of <code>10.0.0.99</code> with <code>REDACTED_IP</code> in-place (<code>sed -i 's/10.0.0.99/REDACTED_IP/g' /tmp/alerts.log</code>).",
+                hint: "Run <code>sed -i 's/10.0.0.99/REDACTED_IP/g' /tmp/alerts.log</code>.",
+                checkCmd: 'grep -q "REDACTED_IP" /tmp/alerts.log 2>/dev/null && ! grep -q "10.0.0.99" /tmp/alerts.log && echo OK',
+                autoSolveCmd: 'sed -i "s/10.0.0.99/REDACTED_IP/g" /tmp/alerts.log'
+            }
+        ]
+    },
+
+    // ========================================================================
+    // 🟩 FOUNDATION 4: GREEN BELT — System Vitals & Process Control (4 Tasks)
+    // ========================================================================
+    {
+        id: "foundation-4-green-belt",
+        track: "foundations",
+        number: "FOUNDATION 04",
+        belt: "Green Belt",
+        beltColor: "green",
+        title: "System Vitals & Process Control (ps, top/htop, Signals & Why Tmux Exists)",
+        theory: `
+            <p>
+                <em>Theory Focus:</em> Every running program is a process with a unique <strong>PID (Process ID)</strong>
+                and a <strong>PPID (Parent PID)</strong>. Understanding processes and UNIX signals explains <em>why
+                <code>tmux</code> was invented</em>.
+            </p>
+            <div class="theory-callout">
+                <div class="theory-callout-title">Processes, <code>htop</code> &amp; The <code>SIGHUP</code> Problem</div>
+                <ul class="theory-keylist">
+                    <li><span><code>ps aux | grep ...</code></span> <span>Snapshot all running processes, owners, CPU/RAM &amp; PIDs</span></li>
+                    <li><span><code>htop</code> / <code>top</code> (<kbd>q</kbd> to quit)</span> <span>Interactive live CPU/RAM meters and process tree</span></li>
+                    <li><span><code>kill &lt;PID&gt;</code> / <code>kill -9 &lt;PID&gt;</code></span> <span>Send polite <code>SIGTERM</code> (15) or forceful <code>SIGKILL</code> (9)</span></li>
+                    <li><span><strong><code>SIGHUP</code> (Hangup Signal)</strong></span> <span>Sent when SSH drops—kills all child processes unless guarded by <code>tmux</code>!</span></li>
+                </ul>
+            </div>
+        `,
+        tasks: [
+            {
+                id: "f4-t1-background-ps",
+                description: "<strong>Spawn &amp; Locate a Background Process (<code>ps</code> &amp; <code>grep</code>):</strong> Start a background process (<code>sleep 500 &amp;</code>), then find its PID using <code>ps</code> and save the matching process line to <code>/tmp/proc.txt</code> (<code>ps aux | grep \"[s]leep 500\" &gt; /tmp/proc.txt</code>).",
+                hint: "Run <code>sleep 500 &amp;</code> and then <code>ps aux | grep \"[s]leep 500\" &gt; /tmp/proc.txt</code>.",
+                checkCmd: 'pgrep -f "sleep 500" >/dev/null && [ -s /tmp/proc.txt ] && echo OK',
+                autoSolveCmd: 'sleep 500 >/dev/null 2>&1 & sleep 0.1 && ps aux | grep "[s]leep 500" > /tmp/proc.txt'
+            },
+            {
+                id: "f4-t2-launch-htop",
+                description: "<strong>Launch Interactive <code>htop</code> (Live System Monitor):</strong> Run <code>htop</code> (or <code>top</code>) in your terminal to inspect live CPU/RAM meters and process trees. <em>(Once the check detects <code>htop</code>/<code>top</code> is running, it marks the step complete—then press <kbd>q</kbd> to exit back to your shell!)</em>",
+                hint: "Type <code>htop</code> and press <kbd>Enter</kbd>. Wait ~1 second for the step to turn green, then press <kbd>q</kbd> to exit <code>htop</code>.",
+                checkCmd: '(pgrep htop >/dev/null || pgrep top >/dev/null) && echo OK',
+                onPassCmd: 'pkill -f "top -b -d 2" 2>/dev/null || true',
+                autoSolveCmd: 'top -b -d 2 >/dev/null 2>&1 &'
+            },
+            {
+                id: "f4-t3-kill-rogue",
+                description: "<strong>Terminate a Rogue Process (<code>kill</code>):</strong> Terminate the background <code>sleep 500</code> process you started earlier using <code>kill</code> or <code>pkill</code> (<code>kill $(pgrep -f \"sleep 500\")</code> or <code>pkill -f \"sleep 500\"</code>).",
+                hint: "Make sure you exited <code>htop</code> (<kbd>q</kbd>), then run <code>pkill -f \"sleep 500\"</code> (or <code>kill $(pgrep -f \"sleep 500\")</code>).",
+                checkCmd: '! pgrep -f "sleep 500" >/dev/null && echo OK',
+                autoSolveCmd: 'pkill -f "sleep 500" 2>/dev/null || true'
+            },
+            {
+                id: "f4-t4-ready-for-tmux",
+                description: "<strong>Verify You Are Ready for <code>tmux</code> (<code>$TMUX</code> Check):</strong> Check that you are currently in the raw host shell (outside <code>tmux</code>) by writing <code>READY_FOR_WHITE_BELT</code> to <code>/tmp/graduated_foundations.txt</code> (<code>echo \"READY_FOR_WHITE_BELT\" &gt; /tmp/graduated_foundations.txt</code>). You are now promoted to <strong>Adult White Belt</strong>—time to enter <code>tmux</code>!",
+                hint: "Run <code>echo \"READY_FOR_WHITE_BELT\" &gt; /tmp/graduated_foundations.txt</code>.",
+                checkCmd: 'grep -q "READY_FOR_WHITE_BELT" /tmp/graduated_foundations.txt 2>/dev/null && echo OK',
+                autoSolveCmd: 'echo "READY_FOR_WHITE_BELT" > /tmp/graduated_foundations.txt'
+            }
+        ]
+    },
+
     // ========================================================================
     // ⬜ KATA 1: WHITE BELT — Survival & Escapes (6 Tasks)
     // ========================================================================

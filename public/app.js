@@ -868,6 +868,9 @@ class TmuxDojoApp {
             await this.inspector.exec(
                 "id teammate >/dev/null 2>&1 || (addgroup devops 2>/dev/null || true; adduser -D -G devops -s /bin/bash teammate 2>/dev/null || true)"
             );
+            await this.inspector.exec(
+                "[ -s /var/log/dojo-auth.log ] || (mkdir -p /var/log && printf 'Nov 05 08:01:12 tmux-dojo sshd[114]: ACCEPTED_LOGIN publickey for sensei from 10.0.0.10 port 51200 ssh2\\nNov 05 08:15:46 tmux-dojo sshd[155]: FAILED_LOGIN password for invalid user admin from 10.0.0.99 port 44810 ssh2\\nNov 05 08:22:21 tmux-dojo sshd[179]: FAILED_LOGIN password for root from 10.0.0.99 port 45102 ssh2\\nNov 05 08:34:11 tmux-dojo sshd[204]: ACCEPTED_LOGIN publickey for sensei from 10.0.0.10 port 52104 ssh2\\nNov 05 08:41:54 tmux-dojo sshd[218]: FAILED_LOGIN password for invalid user guest from 10.0.0.99 port 45988 ssh2\\n' > /var/log/dojo-auth.log)"
+            );
         } catch (err) {
             console.warn("Initial ttyS0 size sync failed:", err);
         }

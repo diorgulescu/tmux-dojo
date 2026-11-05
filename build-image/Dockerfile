@@ -8,9 +8,12 @@ RUN apk update && apk add --no-cache \
     linux-virt \
     tmux \
     nano \
+    htop \
+    procps-ng \
+    grep \
+    sed \
     ncurses \
     ncurses-terminfo-base \
-    ncurses-terminfo \
     bash \
     && rm -rf /var/cache/apk/*
 
@@ -23,7 +26,40 @@ RUN sed -i 's|^root:x:0:0:root:/root:/bin/ash|root:x:0:0:root:/root:/bin/bash|' 
     sed -i 's|^root:x:0:0:root:/root:/bin/sh|root:x:0:0:root:/root:/bin/bash|' /etc/passwd && \
     addgroup -g 1000 devops && \
     adduser -D -u 1000 -G devops -s /bin/bash teammate && \
-    addgroup root devops
+    addgroup root devops && \
+    mkdir -p /var/log && \
+    cat << 'EOF' > /var/log/dojo-auth.log
+Nov 05 08:00:01 tmux-dojo sshd[101]: Server listening on 0.0.0.0 port 22.
+Nov 05 08:01:12 tmux-dojo sshd[114]: ACCEPTED_LOGIN publickey for sensei from 10.0.0.10 port 51200 ssh2
+Nov 05 08:01:12 tmux-dojo sshd[114]: pam_unix(sshd:session): session opened for user sensei(uid=0) by (uid=0)
+Nov 05 08:04:33 tmux-dojo sshd[128]: ACCEPTED_LOGIN publickey for teammate from 10.0.0.14 port 51412 ssh2
+Nov 05 08:04:33 tmux-dojo sshd[128]: pam_unix(sshd:session): session opened for user teammate(uid=1000) by (uid=0)
+Nov 05 08:11:05 tmux-dojo cron[140]: (root) CMD (/usr/local/bin/dojo-healthcheck)
+Nov 05 08:15:42 tmux-dojo sshd[155]: Connection from 10.0.0.99 port 44810 on 10.0.0.1 port 22
+Nov 05 08:15:44 tmux-dojo sshd[155]: Invalid user admin from 10.0.0.99 port 44810
+Nov 05 08:15:46 tmux-dojo sshd[155]: FAILED_LOGIN password for invalid user admin from 10.0.0.99 port 44810 ssh2
+Nov 05 08:15:47 tmux-dojo sshd[155]: Connection closed by invalid user admin 10.0.0.99 port 44810 [preauth]
+Nov 05 08:18:02 tmux-dojo sshd[162]: ACCEPTED_LOGIN publickey for sensei from 10.0.0.10 port 51890 ssh2
+Nov 05 08:18:02 tmux-dojo sshd[162]: pam_unix(sshd:session): session opened for user sensei(uid=0) by (uid=0)
+Nov 05 08:22:19 tmux-dojo sshd[179]: Connection from 10.0.0.99 port 45102 on 10.0.0.1 port 22
+Nov 05 08:22:21 tmux-dojo sshd[179]: FAILED_LOGIN password for root from 10.0.0.99 port 45102 ssh2
+Nov 05 08:22:22 tmux-dojo sshd[179]: Disconnected from authenticating user root 10.0.0.99 port 45102 [preauth]
+Nov 05 08:30:00 tmux-dojo cron[190]: (root) CMD (/usr/local/bin/dojo-healthcheck)
+Nov 05 08:34:11 tmux-dojo sshd[204]: ACCEPTED_LOGIN publickey for sensei from 10.0.0.10 port 52104 ssh2
+Nov 05 08:34:11 tmux-dojo sshd[204]: pam_unix(sshd:session): session opened for user sensei(uid=0) by (uid=0)
+Nov 05 08:41:50 tmux-dojo sshd[218]: Connection from 10.0.0.99 port 45988 on 10.0.0.1 port 22
+Nov 05 08:41:52 tmux-dojo sshd[218]: Invalid user guest from 10.0.0.99 port 45988
+Nov 05 08:41:54 tmux-dojo sshd[218]: FAILED_LOGIN password for invalid user guest from 10.0.0.99 port 45988 ssh2
+Nov 05 08:41:55 tmux-dojo sshd[218]: Connection reset by 10.0.0.99 port 45988 [preauth]
+Nov 05 08:45:00 tmux-dojo syslogd[90]: -- MARK --
+Nov 05 08:50:12 tmux-dojo sshd[233]: ACCEPTED_LOGIN publickey for teammate from 10.0.0.14 port 52910 ssh2
+Nov 05 08:50:12 tmux-dojo sshd[233]: pam_unix(sshd:session): session opened for user teammate(uid=1000) by (uid=0)
+Nov 05 08:55:03 tmux-dojo sshd[128]: pam_unix(sshd:session): session closed for user teammate
+Nov 05 09:00:01 tmux-dojo cron[250]: (root) CMD (/usr/local/bin/dojo-healthcheck)
+Nov 05 09:05:40 tmux-dojo sshd[264]: ACCEPTED_LOGIN publickey for sensei from 10.0.0.10 port 53300 ssh2
+Nov 05 09:05:40 tmux-dojo sshd[264]: pam_unix(sshd:session): session opened for user sensei(uid=0) by (uid=0)
+Nov 05 09:10:00 tmux-dojo sshd[264]: Received keepalive from 10.0.0.10 port 53300
+EOF
 
 # Configure clean bash prompt and environment for root
 RUN cat << 'EOF' > /root/.bashrc

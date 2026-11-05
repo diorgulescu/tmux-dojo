@@ -18,7 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const STORAGE_KEY = "tmux_dojo_bjj_progress_v3";
+const STORAGE_KEY = "tmux_dojo_bjj_progress_v4";
 
 class TutorialEngine {
     /**
@@ -167,6 +167,8 @@ class TutorialEngine {
                 ? `9th/10th Degree Grandmaster • ${earnedStripes} / ${totalStripes} Grandmaster Stripes`
                 : beltColor === "coral"
                 ? `7th Degree Master • ${earnedStripes} / ${totalStripes} Master Stripes`
+                : kata.track === "foundations"
+                ? `UNIX Foundations (Youth Belt) • ${earnedStripes} / ${totalStripes} Stripes (Trese) Earned`
                 : `${earnedStripes} / ${totalStripes} Stripes (Trese) Earned`;
 
         return `
@@ -435,12 +437,17 @@ class TutorialEngine {
 
         const activeTask = this.getActiveTask(kata);
         const kataDone = this.isKataComplete(kata);
+        const isFoundationsTrack = kata.track === "foundations";
+        const whiteBeltIndex = this.katas.findIndex((k) => k.id === "kata-1-white-belt");
 
-        // Build Kata Navigation Tabs
+        // Build Track Switcher + Kata Navigation Tabs
+        let fCount = 0;
+        let kCount = 0;
         const navTabsHtml = this.katas
             .map((k, idx) => {
                 const isCurrent = idx === this.currentKataIndex;
                 const isDone = this.isKataComplete(k);
+                const shortLabel = k.track === "foundations" ? `F${++fCount}` : `K${++kCount}`;
                 return `
                     <button
                         type="button"
@@ -448,13 +455,31 @@ class TutorialEngine {
                         data-kata-index="${idx}"
                         title="${k.number}: ${k.title} (${k.belt})"
                     >
-                        <span class="tab-index">${idx + 1}</span>
+                        <span class="tab-index">${shortLabel}</span>
                         <span class="tab-belt-dot belt-dot-${k.beltColor}"></span>
                         ${isDone ? '<span class="tab-check">✓</span>' : ""}
                     </button>
                 `;
             })
             .join("");
+
+        const trackBarHtml = `
+            <div class="track-filter-bar">
+                <div class="track-toggle-pills">
+                    <button type="button" id="track-btn-foundations" class="track-toggle-btn ${isFoundationsTrack ? "active" : ""}">
+                        🌱 UNIX Foundations (F1–F4)
+                    </button>
+                    <button type="button" id="track-btn-tmux" class="track-toggle-btn ${!isFoundationsTrack ? "active" : ""}">
+                        🥋 Tmux Curriculum (K1–K7)
+                    </button>
+                </div>
+                ${
+                    isFoundationsTrack && whiteBeltIndex !== -1
+                        ? `<button type="button" id="skip-to-whitebelt-btn" class="skip-foundations-btn" title="Jump directly to Adult White Belt (Kata 01)">Skip to White Belt (tmux) →</button>`
+                        : ""
+                }
+            </div>
+        `;
 
         // Build Task Checklist
         let tasksSectionHtml = "";
@@ -558,6 +583,7 @@ class TutorialEngine {
         const nextDisabled = this.currentKataIndex >= this.katas.length - 1 ? "disabled" : "";
 
         this.kataContent.innerHTML = `
+            ${trackBarHtml}
             <nav class="kata-switcher" aria-label="Kata Selection">
                 <div class="kata-tabs-group">
                     ${navTabsHtml}
@@ -596,6 +622,37 @@ class TutorialEngine {
     }
 
     _bindRenderedEvents() {
+        // Track switcher & quick-jump buttons
+        const foundBtn = document.getElementById("track-btn-foundations");
+        if (foundBtn) {
+            foundBtn.addEventListener("click", () => {
+                const firstFoundIdx = this.katas.findIndex((k) => k.track === "foundations");
+                if (firstFoundIdx !== -1) {
+                    this.selectKata(firstFoundIdx);
+                }
+            });
+        }
+
+        const tmuxTrackBtn = document.getElementById("track-btn-tmux");
+        if (tmuxTrackBtn) {
+            tmuxTrackBtn.addEventListener("click", () => {
+                const whiteBeltIdx = this.katas.findIndex((k) => k.id === "kata-1-white-belt");
+                if (whiteBeltIdx !== -1) {
+                    this.selectKata(whiteBeltIdx);
+                }
+            });
+        }
+
+        const skipBtn = document.getElementById("skip-to-whitebelt-btn");
+        if (skipBtn) {
+            skipBtn.addEventListener("click", () => {
+                const whiteBeltIdx = this.katas.findIndex((k) => k.id === "kata-1-white-belt");
+                if (whiteBeltIdx !== -1) {
+                    this.selectKata(whiteBeltIdx);
+                }
+            });
+        }
+
         // Kata tab buttons
         this.kataContent.querySelectorAll(".kata-nav-tab").forEach((btn) => {
             btn.addEventListener("click", () => {

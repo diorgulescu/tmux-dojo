@@ -148,6 +148,30 @@ body {
     transition: all 0.25s ease;
 }
 
+.belt-badge.belt-grey {
+    background-color: rgba(148, 163, 184, 0.2);
+    border-color: #94a3b8;
+    color: #e2e8f0;
+}
+
+.belt-badge.belt-yellow {
+    background-color: rgba(234, 179, 8, 0.22);
+    border-color: #eab308;
+    color: #fef08a;
+}
+
+.belt-badge.belt-orange {
+    background-color: rgba(249, 115, 22, 0.24);
+    border-color: #f97316;
+    color: #fed7aa;
+}
+
+.belt-badge.belt-green {
+    background-color: rgba(34, 197, 94, 0.22);
+    border-color: #22c55e;
+    color: #bbf7d0;
+}
+
 .belt-badge.belt-white {
     background-color: rgba(248, 250, 252, 0.14);
     border-color: #e2e8f0;
@@ -245,6 +269,34 @@ body {
     border-top: 1px dashed rgba(255, 255, 255, 0.18);
     border-bottom: 1px dashed rgba(255, 255, 255, 0.18);
     pointer-events: none;
+}
+
+.belt-fabric-grey {
+    background: linear-gradient(180deg, #64748b 0%, #334155 100%);
+    border-color: #94a3b8;
+    color: #f8fafc;
+}
+
+.belt-fabric-yellow {
+    background: linear-gradient(180deg, #eab308 0%, #a16207 100%);
+    border-color: #fde047;
+    color: #0f172a;
+}
+
+.belt-fabric-yellow .bjj-belt-stitch {
+    border-color: rgba(15, 23, 42, 0.25);
+}
+
+.belt-fabric-orange {
+    background: linear-gradient(180deg, #ea580c 0%, #9a3412 100%);
+    border-color: #fb923c;
+    color: #fff7ed;
+}
+
+.belt-fabric-green {
+    background: linear-gradient(180deg, #16a34a 0%, #14532d 100%);
+    border-color: #4ade80;
+    color: #f0fdf4;
 }
 
 .belt-fabric-white {
@@ -834,6 +886,71 @@ kbd {
     border-radius: 50%;
 }
 
+.track-filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.track-toggle-pills {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    padding: 2px;
+    gap: 2px;
+}
+
+.track-toggle-btn {
+    padding: 4px 9px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.track-toggle-btn:hover {
+    color: var(--text-primary);
+}
+
+.track-toggle-btn.active {
+    background-color: var(--bg-card-elevated);
+    color: var(--accent-cyan);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.skip-foundations-btn {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background-color: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    color: var(--accent-cyan);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.skip-foundations-btn:hover {
+    background-color: rgba(56, 189, 248, 0.22);
+    border-color: var(--accent-cyan);
+    color: var(--text-primary);
+}
+
+.belt-dot-grey { background-color: #94a3b8; }
+.belt-dot-yellow { background-color: #eab308; }
+.belt-dot-orange { background-color: #f97316; }
+.belt-dot-green { background-color: #22c55e; }
 .belt-dot-white { background-color: #f8fafc; }
 .belt-dot-blue { background-color: #3b82f6; }
 .belt-dot-purple { background-color: #a855f7; }
