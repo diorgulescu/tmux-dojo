@@ -435,7 +435,7 @@ const TMUX_DOJO_KATAS = [
             },
             {
                 id: "f4-t4-ready-for-tmux",
-                description: "<strong>Verify You Are Ready for <code>tmux</code> (<code>$TMUX</code> Check):</strong> Check that you are currently in the raw host shell (outside <code>tmux</code>) by writing <code>READY_FOR_WHITE_BELT</code> to <code>/tmp/graduated_foundations.txt</code> (<code>echo \"READY_FOR_WHITE_BELT\" &gt; /tmp/graduated_foundations.txt</code>). You are now promoted to <strong>Adult White Belt</strong>—time to enter <code>tmux</code>!",
+                description: "<strong>Verify You Are Ready for <code>tmux</code>:</strong> From the raw host shell (outside <code>tmux</code>), write <code>READY_FOR_WHITE_BELT</code> to <code>/tmp/graduated_foundations.txt</code> (<code>echo \"READY_FOR_WHITE_BELT\" &gt; /tmp/graduated_foundations.txt</code>). You are now promoted to <strong>Adult White Belt</strong>—time to enter <code>tmux</code>!",
                 hint: "Run <code>echo \"READY_FOR_WHITE_BELT\" &gt; /tmp/graduated_foundations.txt</code>.",
                 checkCmd: 'grep -q "READY_FOR_WHITE_BELT" /tmp/graduated_foundations.txt 2>/dev/null && echo OK',
                 autoSolveCmd: 'echo "READY_FOR_WHITE_BELT" > /tmp/graduated_foundations.txt'
