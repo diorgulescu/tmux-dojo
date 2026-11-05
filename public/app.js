@@ -88,6 +88,10 @@ function analyzeTmuxConfLines(rawText) {
         } else if (/set(?:-option)?\s+-g\s+mouse\s+off/i.test(trimmed)) {
             category = "Ergonomics";
             summary = "Disables mouse support inside tmux.";
+        } else if (/setw\s+-g\s+mode-keys\s+vi/i.test(trimmed)) {
+            category = "Copy Mode (Vi)";
+            summary =
+                "Enables Vim keybindings (h/j/k/l, /, n, Space, Enter) inside tmux Copy/Scrollback mode (Ctrl+b [).";
         } else if (/set(?:-option)?\s+-g\s+base-index\s+(\d+)/i.test(trimmed)) {
             const m = trimmed.match(/base-index\s+(\d+)/i);
             category = "Indexing";
@@ -107,26 +111,69 @@ function analyzeTmuxConfLines(rawText) {
             const m = trimmed.match(/default-terminal\s+["']?([^"'\s]+)["']?/i);
             category = "Colors";
             summary = `Sets the default TERM inside tmux to '${m ? m[1] : "tmux-256color"}' for rich 256-color rendering.`;
+        } else if (/set(?:-option)?\s+-g\s+prefix2\s+(\S+)/i.test(trimmed)) {
+            const m = trimmed.match(/prefix2\s+(\S+)/i);
+            category = "Prefix Key";
+            summary = `Configures a secondary tmux Prefix key chord (${m ? m[1] : "C-a"}) alongside Ctrl+b.`;
         } else if (/set(?:-option)?\s+-g\s+prefix\s+(\S+)/i.test(trimmed)) {
             const m = trimmed.match(/prefix\s+(\S+)/i);
             category = "Prefix Key";
             summary = `Changes the master tmux Prefix key chord to ${m ? m[1] : "a custom key"}.`;
+        } else if (/bind(?:-key)?\s+C-a\s+send-prefix\s+-2/i.test(trimmed)) {
+            category = "Prefix Key";
+            summary = "Passes a literal Ctrl+a through to the underlying shell/program when pressed twice.";
+        } else if (/bind(?:-key)?\s+-n\s+M-(Left|Right|Up|Down)\s+select-pane/i.test(trimmed)) {
+            category = "No-Prefix (-n)";
+            summary =
+                "Root-table binding (-n): switches pane focus directly with Alt+Arrow without pressing Prefix first.";
+        } else if (/bind(?:-key)?\s+-r\s+([HLJK])\s+resize-pane/i.test(trimmed)) {
+            category = "Repeatable (-r)";
+            summary =
+                "Repeatable binding (-r): press Prefix once, then tap H/J/K/L repeatedly to resize the active pane.";
         } else if (/bind(?:-key)?\s+\|\s+split-window\s+-h/i.test(trimmed)) {
             category = "Keybinding";
-            summary = "Binds Prefix + | to split the current pane vertically (left/right).";
+            summary = "Binds Prefix + | to split the current pane vertically (left/right, preserving current path).";
         } else if (/bind(?:-key)?\s+-\s+split-window\s+-v/i.test(trimmed)) {
             category = "Keybinding";
-            summary = "Binds Prefix + - to split the current pane horizontally (top/bottom).";
+            summary = "Binds Prefix + - to split the current pane horizontally (top/bottom, preserving current path).";
         } else if (/bind(?:-key)?\s+r\s+source-file/i.test(trimmed)) {
             category = "Keybinding";
             summary = "Binds Prefix + r to hot-reload ~/.tmux.conf inside the running tmux server.";
         } else if (/bind(?:-key)?\s+(\S+)\s+(.+)/i.test(trimmed)) {
             const m = trimmed.match(/bind(?:-key)?\s+(\S+)\s+(.+)/i);
             category = "Keybinding";
-            summary = `Binds Prefix + '${m[1]}' to run: ${m[2]}`;
-        } else if (/status-style|status-left|status-right|window-status/i.test(trimmed)) {
+            summary = `Binds '${m[1]}' to run: ${m[2]}`;
+        } else if (/pane-active-border-style/i.test(trimmed)) {
+            category = "Pane Borders";
+            summary = "Highlights the active pane's border with a high-contrast foreground color.";
+        } else if (/pane-border-style/i.test(trimmed)) {
+            category = "Pane Borders";
+            summary = "Styles inactive pane borders with a subtle, low-distraction color.";
+        } else if (/window-status-current-format/i.test(trimmed)) {
+            category = "Window Tabs";
+            summary = "Formats the currently focused window tab (#I = index, #W = window name, bold/accent colors).";
+        } else if (/window-status-format/i.test(trimmed)) {
+            category = "Window Tabs";
+            summary = "Formats inactive window tabs on the status bar.";
+        } else if (/status-left\s+/i.test(trimmed) && /client_prefix/i.test(trimmed)) {
+            category = "Live Conditional";
+            summary =
+                "Uses #{?client_prefix,WHEN_ACTIVE,WHEN_IDLE} to change color/text dynamically the instant you press Ctrl+b!";
+        } else if (/status-right\s+/i.test(trimmed)) {
+            category = "Status Telemetry";
+            summary =
+                "Displays live right-hand telemetry (such as #(cut ... /proc/loadavg), #{pane_current_command}, or %H:%M clock).";
+        } else if (/status-interval\s+(\d+)/i.test(trimmed)) {
+            const m = trimmed.match(/status-interval\s+(\d+)/i);
+            category = "Status Telemetry";
+            summary = `Refreshes status bar shell commands and format variables every ${m ? m[1] : "2"} seconds.`;
+        } else if (/status-position\s+(top|bottom)/i.test(trimmed)) {
+            const m = trimmed.match(/status-position\s+(top|bottom)/i);
             category = "Status Bar";
-            summary = "Customizes the appearance, colors, or segments of the bottom tmux status bar.";
+            summary = `Positions the tmux status bar at the ${m ? m[1] : "bottom"} of the terminal screen.`;
+        } else if (/status-style|status-left|window-status/i.test(trimmed)) {
+            category = "Status Bar";
+            summary = "Customizes the appearance, colors, or segments of the tmux status bar.";
         } else if (/set(?:-option)?\s+-s\s+escape-time\s+(\d+)/i.test(trimmed)) {
             const m = trimmed.match(/escape-time\s+(\d+)/i);
             category = "Performance";

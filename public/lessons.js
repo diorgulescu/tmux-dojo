@@ -1,508 +1,490 @@
 // @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPL-3.0-or-later
 /**
- * tmux-dojo — Comprehensive 7-Belt Interactive Kata Curriculum (English)
+ * tmux-dojo — Complete Brazilian Jiu-Jitsu (BJJ) Belt & Stripe Curriculum (English)
  * Copyright (C) 2026 Dragoş Iorgulescu
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * Progression:
+ *   Kata 1: White Belt  — Survival & Escapes (Sessions & Client-Server) [6 Tasks]
+ *   Kata 2: Blue Belt   — Guard Work & Spatial Control (Panes & Windows) [6 Tasks]
+ *   Kata 3: Purple Belt — Flow State, Vi Buffers & Keybinding Modifiers (~/.tmux.conf) [6 Tasks]
+ *   Kata 4: Brown Belt  — Customizing Your Gi (Status Bar Ricing, Colors, Modifiers & Live Telemetry) [5 Tasks]
+ *   Kata 5: Black Belt  — Team Ops, Shared Sockets & Automation (Multi-User & Scripting) [6 Tasks]
+ *   Kata 6: Coral Belt  — Open Mat (Sandbox, Theme Gallery & Master Cheat Sheet) [3 Preset Themes]
  */
 
-const SENSEI_RECOMMENDED_TMUX_CONF = `# ============================================================================
-# Sensei's Recommended ~/.tmux.conf for tmux-dojo
+const TMUX_DOJO_THEMES = {
+    catppuccin: {
+        name: "Catppuccin Mocha Dojo",
+        tagline: "Modern dark pastel palette with dynamic Red/Green Prefix indicator & live CPU load",
+        conf: `# ============================================================================
+# Theme: Catppuccin Mocha Dojo (Sensei's Recommended Default)
 # ============================================================================
 
-# Enable full mouse support (click panes, click windows, drag borders, scroll)
+# Core Ergonomics & Vi Copy Mode
 set -g mouse on
-
-# Start window and pane numbering at 1 instead of 0 (matches keyboard layout)
+setw -g mode-keys vi
 set -g base-index 1
 setw -g pane-base-index 1
 set -g renumber-windows on
-
-# Increase scrollback history limit
 set -g history-limit 10000
-
-# Ensure 256-color and truecolor support
 set -g default-terminal "tmux-256color"
 
-# Intuitive pane splitting with | and -
-bind | split-window -h
-bind - split-window -v
+# Dual Prefix (Ctrl+b and Ctrl+a)
+set -g prefix2 C-a
+bind C-a send-prefix -2
 
-# Fast config reload with Prefix + r
-bind r source-file ~/.tmux.conf \\; display "Reloaded!"
+# Intuitive Splits Keeping Current Path
+bind | split-window -h -c "#{pane_current_path}"
+bind - split-window -v -c "#{pane_current_path}"
 
-# Clean, high-contrast status bar
-set -g status-style bg=black,fg=green
-set -g status-left "#[bg=green,fg=black,bold] #S #[bg=black,fg=green] "
-set -g status-right "#[fg=cyan]%H:%M #[bg=cyan,fg=black,bold] dojo "
-`;
+# No-Prefix Alt Arrow Pane Navigation & Repeatable Resizing
+bind -n M-Left select-pane -L
+bind -n M-Right select-pane -R
+bind -r H resize-pane -L 5
+bind -r L resize-pane -R 5
+
+# Fast Config Reload
+bind r source-file ~/.tmux.conf \\; display "Catppuccin Mocha Dojo Reloaded!"
+
+# Catppuccin Mocha Status Bar & Borders
+set -g status-position bottom
+set -g status-interval 2
+set -g status-style "bg=#1e1e2e,fg=#cdd6f4"
+set -g pane-border-style "fg=#45475a"
+set -g pane-active-border-style "fg=#a6e3a1,bold"
+
+setw -g window-status-style "bg=#181825,fg=#a6adc8"
+setw -g window-status-format " #I:#W "
+setw -g window-status-current-style "bg=#89b4fa,fg=#11111b,bold"
+setw -g window-status-current-format " #I:#W#{?window_zoomed_flag, [Z],} "
+
+set -g status-left-length 40
+set -g status-left "#{?client_prefix,#[bg=#f38ba8 fg=#11111b bold] PREFIX #[default],#[bg=#a6e3a1 fg=#11111b bold] #S #[default]} "
+
+set -g status-right-length 80
+set -g status-right "#[fg=#f9e2af]CMD:#{pane_current_command} #[fg=#89b4fa]| LOAD:#(cut -d' ' -f1 /proc/loadavg) #[fg=#cdd6f4]| %H:%M "
+`
+    },
+    matrix: {
+        name: "Cyberpunk Matrix",
+        tagline: "High-contrast neon phosphor green on pure black with sharp cybernetic borders",
+        conf: `# ============================================================================
+# Theme: Cyberpunk Matrix
+# ============================================================================
+
+set -g mouse on
+setw -g mode-keys vi
+set -g base-index 1
+setw -g pane-base-index 1
+set -g renumber-windows on
+set -g default-terminal "tmux-256color"
+
+set -g prefix2 C-a
+bind C-a send-prefix -2
+bind | split-window -h -c "#{pane_current_path}"
+bind - split-window -v -c "#{pane_current_path}"
+bind -n M-Left select-pane -L
+bind -n M-Right select-pane -R
+bind -r H resize-pane -L 5
+bind -r L resize-pane -R 5
+bind r source-file ~/.tmux.conf \\; display "Matrix Protocol Reloaded!"
+
+# High-Contrast Phosphor Green on Void Black
+set -g status-position bottom
+set -g status-interval 2
+set -g status-style "bg=#000000,fg=#00ff66"
+set -g pane-border-style "fg=#003311"
+set -g pane-active-border-style "fg=#00ff66,bold"
+
+setw -g window-status-style "bg=#000000,fg=#008833"
+setw -g window-status-format " [#I:#W] "
+setw -g window-status-current-style "bg=#00ff66,fg=#000000,bold"
+setw -g window-status-current-format " <#I:#W#{?window_zoomed_flag,*Z*,}> "
+
+set -g status-left-length 40
+set -g status-left "#{?client_prefix,#[bg=#ff0055 fg=#000000 bold] [OVERRIDE] #[default],#[bg=#00ff66 fg=#000000 bold] [#S] #[default]} "
+
+set -g status-right-length 80
+set -g status-right "#[fg=#00ff66]SYS:#{pane_current_command} // LOAD:#(cut -d' ' -f1 /proc/loadavg) // %H:%M:%S "
+`
+    },
+    zen: {
+        name: "Minimalist Zen",
+        tagline: "Top status bar, muted slate typography, and distraction-free monochrome focus",
+        conf: `# ============================================================================
+# Theme: Minimalist Zen
+# ============================================================================
+
+set -g mouse on
+setw -g mode-keys vi
+set -g base-index 1
+setw -g pane-base-index 1
+set -g renumber-windows on
+set -g default-terminal "tmux-256color"
+
+set -g prefix2 C-a
+bind C-a send-prefix -2
+bind | split-window -h -c "#{pane_current_path}"
+bind - split-window -v -c "#{pane_current_path}"
+bind -n M-Left select-pane -L
+bind -n M-Right select-pane -R
+bind -r H resize-pane -L 5
+bind -r L resize-pane -R 5
+bind r source-file ~/.tmux.conf \\; display "Zen Config Reloaded"
+
+# Top Status Bar & Muted Monochrome Aesthetics
+set -g status-position top
+set -g status-interval 5
+set -g status-justify left
+set -g status-style "bg=#0e141f,fg=#647792"
+set -g pane-border-style "fg=#182336"
+set -g pane-active-border-style "fg=#647792"
+
+setw -g window-status-style "bg=#0e141f,fg=#647792"
+setw -g window-status-format "  #I·#W  "
+setw -g window-status-current-style "bg=#0e141f,fg=#eef4fc,bold,underscore"
+setw -g window-status-current-format "  #I·#W#{?window_zoomed_flag, (z),}  "
+
+set -g status-left-length 30
+set -g status-left "#{?client_prefix,#[fg=#f59e0b bold] ● #S ,#[fg=#9fb0c7] ○ #S } "
+
+set -g status-right-length 60
+set -g status-right "#[fg=#647792]#{pane_current_command}  %H:%M "
+`
+    }
+};
+
+const SENSEI_RECOMMENDED_TMUX_CONF = TMUX_DOJO_THEMES.catppuccin.conf;
 
 const TMUX_DOJO_KATAS = [
     // ========================================================================
-    // 🥋 KATA 1: WHITE BELT (6 Tasks)
+    // ⬜ KATA 1: WHITE BELT — Survival & Escapes (6 Tasks)
     // ========================================================================
     {
-        id: "kata-1-sessions",
+        id: "kata-1-white-belt",
         number: "KATA 01",
         belt: "White Belt",
         beltColor: "white",
-        title: "Entering the Dojo (Sessions & Client-Server)",
+        title: "Survival & Escapes (Sessions & Client-Server)",
         theory: `
             <p>
-                Unlike a standard shell that dies the moment your terminal window closes or your SSH connection drops,
-                <code>tmux</code> uses a <strong>client-server architecture</strong>. Launching <code>tmux</code> starts an
-                independent background server that keeps your running processes, builds, and editors alive inside named
-                <strong>sessions</strong>.
+                <em>Philosophy:</em> Before learning flashy submissions, a White Belt learns how to survive. In <code>tmux</code>,
+                survival means decoupling your running processes from volatile SSH connections and mastering the
+                <kbd>Ctrl+b</kbd> <strong>Prefix</strong> key.
             </p>
             <div class="theory-callout">
-                <div class="theory-callout-title">Mastering the <kbd>Ctrl+b</kbd> Prefix Key</div>
-                <p>
-                    To prevent keybinding collisions with your shell or editor, <code>tmux</code> listens for a two-step chord
-                    called the <strong>Prefix key</strong>:
-                </p>
+                <div class="theory-callout-title">The Two-Step Prefix Chord (<kbd>Ctrl+b</kbd>)</div>
                 <ol class="theory-steps">
-                    <li>Hold <kbd>Ctrl</kbd> and press <kbd>b</kbd>.</li>
-                    <li><strong>Release both keys completely.</strong> (Watch the top-bar badge light up green!)</li>
-                    <li>Press the action key (e.g., <kbd>$</kbd> to rename session, <kbd>d</kbd> to detach, <kbd>s</kbd> to switch sessions).</li>
+                    <li>Hold <kbd>Ctrl</kbd> and tap <kbd>b</kbd>.</li>
+                    <li><strong>Release both keys completely.</strong></li>
+                    <li>Press your target command key (<kbd>$</kbd> to rename, <kbd>d</kbd> to detach, <kbd>s</kbd> to choose session).</li>
                 </ol>
             </div>
         `,
         tasks: [
             {
-                id: "k1-t1-start-dojo",
-                description: "<strong>Start your first named session:</strong> Start a new session named <code>dojo</code> (<code>tmux new -s dojo</code>).",
-                hint: "Type <code>tmux new -s dojo</code> in the terminal on the right and press <kbd>Enter</kbd>.",
+                id: "k1-t1-whitebelt-session",
+                description: "<strong>Step onto the Mat (Named Session):</strong> Start a new session named <code>whitebelt</code> (<code>tmux new -s whitebelt</code>).",
+                hint: "Type <code>tmux new -s whitebelt</code> in the terminal and press <kbd>Enter</kbd>.",
+                checkCmd: 'tmux has-session -t whitebelt 2>/dev/null && echo OK',
+                autoSolveCmd: 'tmux has-session -t whitebelt 2>/dev/null || tmux new-session -d -s whitebelt',
+                autoSteps: [
+                    { type: "ttyS0", data: "tmux new -s whitebelt\n" },
+                    { type: "ttyS1", cmd: "tmux has-session -t whitebelt 2>/dev/null || tmux new-session -d -s whitebelt" }
+                ]
+            },
+            {
+                id: "k1-t2-rename-dojo",
+                description: "<strong>Rename on the Fly:</strong> Press <kbd>Ctrl+b</kbd> <kbd>$</kbd> and rename the active session to <code>dojo</code>.",
+                hint: "Press <kbd>Ctrl+b</kbd>, release both keys, then press <kbd>$</kbd> (<kbd>Shift+4</kbd>). Clear <code>whitebelt</code>, type <code>dojo</code>, and hit <kbd>Enter</kbd> (or run <code>tmux rename-session dojo</code>).",
                 checkCmd: 'tmux has-session -t dojo 2>/dev/null && echo OK',
-                autoSolveCmd: 'tmux has-session -t dojo 2>/dev/null || tmux new-session -d -s dojo',
+                autoSolveCmd: 'if tmux has-session -t whitebelt 2>/dev/null; then tmux rename-session -t whitebelt dojo; elif ! tmux has-session -t dojo 2>/dev/null; then tmux new-session -d -s dojo; fi'
+            },
+            {
+                id: "k1-t3-clean-escape",
+                description: "<strong>The Clean Escape (Detach):</strong> Escape back to the host shell while keeping your <code>dojo</code> session alive inside the server (<kbd>Ctrl+b</kbd> <kbd>d</kbd>).",
+                hint: "Press <kbd>Ctrl+b</kbd>, release both keys, then press <kbd>d</kbd> (or run <code>tmux detach</code>).",
+                checkCmd: 'tmux list-sessions -F "#{session_name}:#{session_attached}" 2>/dev/null | grep -qx "dojo:0" && echo OK',
+                autoSolveCmd: 'tmux has-session -t dojo 2>/dev/null || tmux new-session -d -s dojo; tmux detach-client -s dojo 2>/dev/null || true'
+            },
+            {
+                id: "k1-t4-background-opponent",
+                description: "<strong>Spawn a Background Opponent:</strong> While in the host shell, create a second detached session named <code>drills</code> without entering it (<code>tmux new -s drills -d</code>).",
+                hint: "Run <code>tmux new -s drills -d</code> in the shell. The <code>-d</code> flag starts the session detached in the background.",
+                checkCmd: 'tmux list-sessions -F "#{session_name}:#{session_attached}" 2>/dev/null | grep -qx "drills:0" && echo OK',
+                autoSolveCmd: 'tmux has-session -t drills 2>/dev/null || tmux new-session -d -s drills; tmux detach-client -s drills 2>/dev/null || true'
+            },
+            {
+                id: "k1-t5-reengage-dojo",
+                description: "<strong>Re-engage (Attach):</strong> Re-attach to your <code>dojo</code> session (<code>tmux attach -t dojo</code>).",
+                hint: "Type <code>tmux attach -t dojo</code> (or <code>tmux a -t dojo</code>) and press <kbd>Enter</kbd>.",
+                checkCmd: 'tmux list-sessions -F "#{session_name}:#{session_attached}" 2>/dev/null | grep -qx "dojo:1" && echo OK',
                 autoSteps: [
-                    { type: "ttyS0", data: "tmux new -s dojo\n" },
-                    { type: "ttyS1", cmd: "tmux has-session -t dojo 2>/dev/null || tmux new-session -d -s dojo" }
+                    { type: "ttyS1", cmd: "tmux has-session -t dojo 2>/dev/null || tmux new-session -d -s dojo" },
+                    { type: "ttyS0", data: "tmux attach -t dojo\n" }
                 ]
             },
             {
-                id: "k1-t2-rename-core",
-                description: "<strong>Rename an active session from inside:</strong> Your project scope changed. Press <kbd>Ctrl+b</kbd> <kbd>$</kbd>, clear the name, and rename the current session to <code>core</code> (or run <code>tmux rename-session core</code>).",
-                hint: "Press <kbd>Ctrl+b</kbd>, release both keys, then press <kbd>$</kbd> (<kbd>Shift+4</kbd>). Backspace out <code>dojo</code>, type <code>core</code>, and press <kbd>Enter</kbd>.",
-                checkCmd: 'tmux has-session -t core 2>/dev/null && echo OK',
-                autoSolveCmd: 'if tmux has-session -t dojo 2>/dev/null; then tmux rename-session -t dojo core; elif ! tmux has-session -t core 2>/dev/null; then tmux new-session -d -s core; fi'
-            },
-            {
-                id: "k1-t3-detach-core",
-                description: "<strong>Detach without killing processes:</strong> Detach from the <code>core</code> session back to the host shell using <kbd>Ctrl+b</kbd> <kbd>d</kbd>.",
-                hint: "Press <kbd>Ctrl+b</kbd>, release both keys, then press <kbd>d</kbd>. Your <code>core</code> session stays alive in the background!",
-                checkCmd: 'tmux list-sessions -F "#{session_name}:#{session_attached}" 2>/dev/null | grep -qx "core:0" && echo OK',
-                autoSolveCmd: 'tmux has-session -t core 2>/dev/null || tmux new-session -d -s core; tmux detach-client -s core 2>/dev/null || true'
-            },
-            {
-                id: "k1-t4-bg-worker",
-                description: "<strong>Create a second background session:</strong> While detached in the host shell, create a second detached session named <code>bg-worker</code> without entering it (<code>tmux new -s bg-worker -d</code>).",
-                hint: "Run <code>tmux new -s bg-worker -d</code> in the shell. The <code>-d</code> flag tells tmux to create the session in the background without attaching to it.",
-                checkCmd: 'tmux has-session -t bg-worker 2>/dev/null && tmux list-sessions -F "#{session_name}:#{session_attached}" | grep -qx "bg-worker:0" && echo OK',
-                autoSolveCmd: 'tmux has-session -t bg-worker 2>/dev/null || tmux new-session -d -s bg-worker; tmux detach-client -s bg-worker 2>/dev/null || true'
-            },
-            {
-                id: "k1-t5-reattach-core",
-                description: "<strong>Re-attach to your primary session:</strong> Re-enter the <code>core</code> session (<code>tmux attach -t core</code> or <code>tmux a -t core</code>).",
-                hint: "Type <code>tmux attach -t core</code> (or shorthand <code>tmux a -t core</code>) in the terminal and press <kbd>Enter</kbd>.",
-                checkCmd: 'tmux list-sessions -F "#{session_name}:#{session_attached}" 2>/dev/null | grep -qx "core:1" && echo OK',
-                autoSolveCmd: 'tmux has-session -t core 2>/dev/null || tmux new-session -d -s core; if tmux list-clients 2>/dev/null | grep -q .; then tmux switch-client -t core; fi',
-                autoSteps: [
-                    { type: "ttyS1", cmd: "tmux has-session -t core 2>/dev/null || tmux new-session -d -s core" },
-                    { type: "ttyS0", data: "tmux attach -t core\n" }
-                ]
-            },
-            {
-                id: "k1-t6-switch-session",
-                description: "<strong>Switch sessions from inside tmux:</strong> Use the interactive session tree (<kbd>Ctrl+b</kbd> <kbd>s</kbd>, then use arrow keys and <kbd>Enter</kbd>) or <kbd>Ctrl+b</kbd> <kbd>)</kbd> to switch directly into the <code>bg-worker</code> session without detaching first.",
-                hint: "Press <kbd>Ctrl+b</kbd> then <kbd>s</kbd> to open the interactive session list, highlight <code>bg-worker</code>, and press <kbd>Enter</kbd> (or press <kbd>Ctrl+b</kbd> then <kbd>)</kbd> to cycle to the next session).",
-                checkCmd: 'tmux list-sessions -F "#{session_name}:#{session_attached}" 2>/dev/null | grep -qx "bg-worker:1" && echo OK',
-                autoSolveCmd: 'tmux has-session -t bg-worker 2>/dev/null || tmux new-session -d -s bg-worker; tmux switch-client -t bg-worker 2>/dev/null || true',
-                autoSteps: [
-                    { type: "ttyS1", cmd: "tmux has-session -t bg-worker 2>/dev/null || tmux new-session -d -s bg-worker; tmux switch-client -t bg-worker 2>/dev/null || true" }
-                ]
+                id: "k1-t6-transition-sessions",
+                description: "<strong>Transition Between Sessions (<kbd>Ctrl+b</kbd> <kbd>s</kbd>):</strong> Without detaching, open the interactive session chooser (<kbd>Ctrl+b</kbd> <kbd>s</kbd>), select <code>drills</code>, and press <kbd>Enter</kbd>.",
+                hint: "Press <kbd>Ctrl+b</kbd> then <kbd>s</kbd>, use the arrow keys to highlight <code>drills</code>, and press <kbd>Enter</kbd> (or press <kbd>Ctrl+b</kbd> <kbd>)</kbd>).",
+                checkCmd: 'tmux list-sessions -F "#{session_name}:#{session_attached}" 2>/dev/null | grep -qx "drills:1" && echo OK',
+                autoSolveCmd: 'tmux has-session -t drills 2>/dev/null || tmux new-session -d -s drills; tmux switch-client -t drills 2>/dev/null || true'
             }
         ]
     },
 
     // ========================================================================
-    // 🟨 KATA 2: YELLOW BELT (6 Tasks)
+    // 🟦 KATA 2: BLUE BELT — Guard Work & Spatial Control (6 Tasks)
     // ========================================================================
     {
-        id: "kata-2-panes",
+        id: "kata-2-blue-belt",
         number: "KATA 02",
-        belt: "Yellow Belt",
-        beltColor: "yellow",
-        title: "Blade Work (Panes & Spatial Control)",
+        belt: "Blue Belt",
+        beltColor: "blue",
+        title: "Guard Work & Spatial Control (Panes & Windows)",
         theory: `
             <p>
-                Inside any <code>tmux</code> window, you can slice your terminal into multiple side-by-side <strong>panes</strong>.
-                Split panes let you edit source code, tail logs, and run tests simultaneously—and when you need to focus on one pane,
-                you can toggle <strong>Monocle Zoom</strong> (<kbd>Ctrl+b</kbd> <kbd>z</kbd>) to temporarily maximize it.
+                <em>Philosophy:</em> A Blue Belt controls distance and angles. Here you master splitting panes, isolating a
+                single pane with Monocle Zoom, sweeping layouts, creating windows, and breaking panes out into standalone windows.
             </p>
             <div class="theory-callout">
-                <div class="theory-callout-title">Pane Control Keybindings</div>
+                <div class="theory-callout-title">Spatial Control Keybindings</div>
                 <ul class="theory-keylist">
-                    <li><span><kbd>Ctrl+b</kbd> then <kbd>%</kbd></span> <span>Split active pane <strong>vertically</strong> (left / right)</span></li>
-                    <li><span><kbd>Ctrl+b</kbd> then <kbd>"</kbd></span> <span>Split active pane <strong>horizontally</strong> (top / bottom)</span></li>
-                    <li><span><kbd>Ctrl+b</kbd> then <kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> or <kbd>o</kbd></span> <span>Navigate between panes</span></li>
-                    <li><span><kbd>Ctrl+b</kbd> then <kbd>z</kbd></span> <span>Toggle <strong>Pane Zoom</strong> (fullscreen / restore)</span></li>
-                    <li><span><kbd>Ctrl+b</kbd> then <kbd>Space</kbd></span> <span>Cycle preset pane layouts</span></li>
-                    <li><span><kbd>Ctrl+b</kbd> then <kbd>x</kbd></span> <span>Close active pane (or type <code>exit</code>)</span></li>
+                    <li><span><kbd>Ctrl+b</kbd> <kbd>%</kbd> / <kbd>"</kbd></span> <span>Split pane Vertically (left/right) or Horizontally (top/bottom)</span></li>
+                    <li><span><kbd>Ctrl+b</kbd> <kbd>z</kbd></span> <span>Toggle <strong>Pane Zoom</strong> (fullscreen monocle mode)</span></li>
+                    <li><span><kbd>Ctrl+b</kbd> <kbd>Space</kbd></span> <span>Sweep / cycle panes through preset layouts</span></li>
+                    <li><span><kbd>Ctrl+b</kbd> <kbd>c</kbd> / <kbd>,</kbd></span> <span>Create a new window / Rename active window</span></li>
+                    <li><span><kbd>Ctrl+b</kbd> <kbd>!</kbd></span> <span><strong>Break</strong> active pane into its own standalone window</span></li>
                 </ul>
             </div>
         `,
         tasks: [
             {
-                id: "k2-t1-vertical-split",
-                description: "<strong>Vertical Split (Left / Right):</strong> Inside your active session, split the screen into left and right panes using <kbd>Ctrl+b</kbd> <kbd>%</kbd>.",
+                id: "k2-t1-split-vertical",
+                description: "<strong>Split the Guard Vertically:</strong> Split your current window into left and right panes (<kbd>Ctrl+b</kbd> <kbd>%</kbd>).",
                 hint: "Press <kbd>Ctrl+b</kbd>, release both keys, then press <kbd>%</kbd> (<kbd>Shift+5</kbd>).",
                 checkCmd: '[ $(tmux list-panes 2>/dev/null | wc -l) -eq 2 ] && echo OK',
                 autoSolveCmd: 'tmux has-session 2>/dev/null || tmux new-session -d -s dojo; while [ $(tmux list-panes 2>/dev/null | wc -l) -gt 1 ]; do tmux kill-pane; done; tmux split-window -h'
             },
             {
-                id: "k2-t2-horizontal-split",
-                description: "<strong>Horizontal Split (Top / Bottom):</strong> Split the currently active pane into top and bottom panes using <kbd>Ctrl+b</kbd> <kbd>\"</kbd>.",
-                hint: "Press <kbd>Ctrl+b</kbd>, release both keys, then press <kbd>\"</kbd> (double quote). You should now have 3 panes total.",
+                id: "k2-t2-split-horizontal",
+                description: "<strong>Split Horizontally:</strong> Split the active pane into top and bottom panes (<kbd>Ctrl+b</kbd> <kbd>\"</kbd>).",
+                hint: "Press <kbd>Ctrl+b</kbd>, release both keys, then press <kbd>\"</kbd> (double quote) so there are 3 panes total.",
                 checkCmd: '[ $(tmux list-panes 2>/dev/null | wc -l) -eq 3 ] && echo OK',
                 autoSolveCmd: 'while [ $(tmux list-panes 2>/dev/null | wc -l) -lt 2 ]; do tmux split-window -h; done; while [ $(tmux list-panes 2>/dev/null | wc -l) -gt 2 ]; do tmux kill-pane; done; tmux split-window -v'
             },
             {
-                id: "k2-t3-navigate-pane-0",
-                description: "<strong>Pane Navigation:</strong> Move focus back to the first (leftmost) pane (index 0) using <kbd>Ctrl+b</kbd> <kbd>←</kbd> (Left Arrow) or <kbd>Ctrl+b</kbd> <kbd>o</kbd>.",
-                hint: "Press <kbd>Ctrl+b</kbd> then <kbd>Left Arrow</kbd> (or <kbd>Ctrl+b</kbd> then <kbd>o</kbd>) until the green active border highlights the leftmost pane (index 0).",
-                checkCmd: 'tmux list-panes -F "#{pane_index}:#{pane_active}" 2>/dev/null | grep -qx "0:1" && echo OK',
-                autoSolveCmd: 'tmux select-pane -t :.0'
-            },
-            {
-                id: "k2-t4-zoom-pane",
-                description: "<strong>Toggle Pane Zoom (Monocle Mode):</strong> Temporarily maximize the active pane to full screen using <kbd>Ctrl+b</kbd> <kbd>z</kbd> so you can read long output clearly.",
-                hint: "Press <kbd>Ctrl+b</kbd>, release both keys, then press <kbd>z</kbd>. Notice the <code>Z</code> flag on your active window in the bottom status bar!",
+                id: "k2-t3-isolate-zoom",
+                description: "<strong>Isolate the Limb (Pane Zoom):</strong> Maximize the active pane to full screen using <kbd>Ctrl+b</kbd> <kbd>z</kbd> so you can focus on a single task.",
+                hint: "Press <kbd>Ctrl+b</kbd> then <kbd>z</kbd>. Notice the <code>Z</code> indicator on your window tab!",
                 checkCmd: '[ "$(tmux display-message -p \'#{window_zoomed_flag}\' 2>/dev/null)" = "1" ] && echo OK',
                 autoSolveCmd: '[ "$(tmux display-message -p \'#{window_zoomed_flag}\' 2>/dev/null)" = "1" ] || tmux resize-pane -Z'
             },
             {
-                id: "k2-t5-unzoom-cycle-layout",
-                description: "<strong>Unzoom &amp; Cycle Layouts:</strong> Unzoom the pane (<kbd>Ctrl+b</kbd> <kbd>z</kbd>), then press <kbd>Ctrl+b</kbd> <kbd>Space</kbd> to cycle the 3 panes into an automatic preset layout (such as <code>even-horizontal</code> or <code>main-vertical</code>).",
-                hint: "Press <kbd>Ctrl+b</kbd> <kbd>z</kbd> to restore your 3 panes, then press <kbd>Ctrl+b</kbd> <kbd>Space</kbd> to rearrange them.",
+                id: "k2-t4-unzoom-sweep",
+                description: "<strong>Unzoom &amp; Sweep Layout:</strong> Unzoom (<kbd>Ctrl+b</kbd> <kbd>z</kbd>) and press <kbd>Ctrl+b</kbd> <kbd>Space</kbd> to rearrange the 3 panes into an automatic layout.",
+                hint: "Press <kbd>Ctrl+b</kbd> <kbd>z</kbd> to restore the 3 panes, then press <kbd>Ctrl+b</kbd> <kbd>Space</kbd>.",
                 checkCmd: '[ "$(tmux display-message -p \'#{window_zoomed_flag}\' 2>/dev/null)" = "0" ] && [ $(tmux list-panes 2>/dev/null | wc -l) -eq 3 ] && echo OK',
                 autoSolveCmd: '[ "$(tmux display-message -p \'#{window_zoomed_flag}\' 2>/dev/null)" = "0" ] || tmux resize-pane -Z; tmux next-layout'
             },
             {
-                id: "k2-t6-close-pane",
-                description: "<strong>Close a Pane:</strong> Navigate to the last pane (index 2) and close it using <kbd>Ctrl+b</kbd> <kbd>x</kbd> (confirm with <kbd>y</kbd>) or by typing <code>exit</code>.",
-                hint: "Type <code>exit</code> and press <kbd>Enter</kbd> in one of the panes (or press <kbd>Ctrl+b</kbd> <kbd>x</kbd> then <kbd>y</kbd>) so 2 panes remain.",
-                checkCmd: '[ $(tmux list-panes 2>/dev/null | wc -l) -eq 2 ] && echo OK',
-                autoSolveCmd: 'while [ $(tmux list-panes 2>/dev/null | wc -l) -gt 2 ]; do tmux kill-pane -t :.2 2>/dev/null || tmux kill-pane; done; while [ $(tmux list-panes 2>/dev/null | wc -l) -lt 2 ]; do tmux split-window -h; done'
+                id: "k2-t5-window-telemetry",
+                description: "<strong>Open a New Room (Windows):</strong> Create a new window (<kbd>Ctrl+b</kbd> <kbd>c</kbd>) and rename it (<kbd>Ctrl+b</kbd> <kbd>,</kbd>) to <code>telemetry</code>.",
+                hint: "Press <kbd>Ctrl+b</kbd> <kbd>c</kbd> to create a new window, then press <kbd>Ctrl+b</kbd> <kbd>,</kbd> (comma), type <code>telemetry</code>, and hit <kbd>Enter</kbd>.",
+                checkCmd: 'tmux list-windows -F "#{window_name}" 2>/dev/null | grep -qx "telemetry" && echo OK',
+                autoSolveCmd: 'tmux new-window -n telemetry'
+            },
+            {
+                id: "k2-t6-break-pane",
+                description: "<strong>Break a Pane into a Standalone Window (<kbd>Ctrl+b</kbd> <kbd>!</kbd>):</strong> Switch back to window 0 (<kbd>Ctrl+b</kbd> <kbd>0</kbd>) and press <kbd>Ctrl+b</kbd> <kbd>!</kbd> to break the active pane out into its own independent window.",
+                hint: "Press <kbd>Ctrl+b</kbd> <kbd>0</kbd> to select window 0, then press <kbd>Ctrl+b</kbd> followed by <kbd>!</kbd> (<kbd>Shift+1</kbd>).",
+                checkCmd: '[ $(tmux list-windows 2>/dev/null | wc -l) -ge 3 ] && echo OK',
+                autoSolveCmd: 'tmux select-window -t :0 2>/dev/null || true; while [ $(tmux list-windows 2>/dev/null | wc -l) -lt 3 ]; do tmux split-window -h && tmux break-pane; done'
             }
         ]
     },
 
     // ========================================================================
-    // 🟧 KATA 3: ORANGE BELT (5 Tasks)
+    // 🟪 KATA 3: PURPLE BELT — Flow State, Vi Buffers & Keybinding Modifiers (6 Tasks)
     // ========================================================================
     {
-        id: "kata-3-windows",
+        id: "kata-3-purple-belt",
         number: "KATA 03",
-        belt: "Orange Belt",
-        beltColor: "orange",
-        title: "Multiple Rooms (Windows & Workflow Organization)",
+        belt: "Purple Belt",
+        beltColor: "purple",
+        title: "Flow State, Vi Buffers & Keybinding Modifiers (~/.tmux.conf)",
         theory: `
             <p>
-                <code>tmux</code> <strong>windows</strong> act like virtual desktops or browser tabs inside your session.
-                Instead of cramming 8 tiny panes onto one screen, organize distinct contexts into named windows
-                (such as <code>editor</code>, <code>server</code>, and <code>logs</code>) and pop crowded panes out into their own window with <kbd>Ctrl+b</kbd> <kbd>!</kbd>.
+                <em>Philosophy:</em> At Purple Belt, you develop your own game. You stop fighting default ergonomics:
+                you enable Vi-style Copy Mode, add <code>Ctrl+a</code> as a secondary prefix, and unlock <code>bind</code>
+                <strong>modifiers</strong> in <code>~/.tmux.conf</code>:
             </p>
             <div class="theory-callout">
-                <div class="theory-callout-title">Window Management Keybindings</div>
+                <div class="theory-callout-title">Keybinding Modifiers Explained</div>
                 <ul class="theory-keylist">
-                    <li><span><kbd>Ctrl+b</kbd> then <kbd>c</kbd></span> <span><strong>Create</strong> a new window</span></li>
-                    <li><span><kbd>Ctrl+b</kbd> then <kbd>,</kbd></span> <span><strong>Rename</strong> the active window</span></li>
-                    <li><span><kbd>Ctrl+b</kbd> then <kbd>0</kbd>–<kbd>9</kbd></span> <span>Jump to window by index number</span></li>
-                    <li><span><kbd>Ctrl+b</kbd> then <kbd>n</kbd> / <kbd>p</kbd></span> <span>Cycle to <strong>Next</strong> / <strong>Previous</strong> window</span></li>
-                    <li><span><kbd>Ctrl+b</kbd> then <kbd>!</kbd></span> <span><strong>Break</strong> active pane into a standalone window</span></li>
+                    <li><span><code>bind | split-window -h -c "#{pane_current_path}"</code></span> <span>Preserve current directory when splitting</span></li>
+                    <li><span><code>bind -n M-Left select-pane -L</code></span> <span><strong><code>-n</code> (Root Table):</strong> Use <kbd>Alt+Left</kbd> directly with <em>no Prefix required</em>!</span></li>
+                    <li><span><code>bind -r H resize-pane -L 5</code></span> <span><strong><code>-r</code> (Repeatable):</strong> Press Prefix once, then tap <kbd>H</kbd> repeatedly</span></li>
                 </ul>
             </div>
         `,
         tasks: [
             {
-                id: "k3-t1-create-window",
-                description: "<strong>Create a New Window:</strong> Press <kbd>Ctrl+b</kbd> <kbd>c</kbd> to create a second window in your current session.",
-                hint: "Press <kbd>Ctrl+b</kbd>, release both keys, then press <kbd>c</kbd>. Watch a new numbered window tab appear in the bottom status bar.",
-                checkCmd: '[ $(tmux list-windows 2>/dev/null | wc -l) -ge 2 ] && echo OK',
-                autoSolveCmd: 'tmux has-session 2>/dev/null || tmux new-session -d -s dojo; while [ $(tmux list-windows 2>/dev/null | wc -l) -lt 2 ]; do tmux new-window; done'
+                id: "k3-t1-vi-mode-mouse",
+                description: "<strong>Enable Vi Keys in Copy Mode:</strong> Edit <code>~/.tmux.conf</code> (via <code>nano</code> or the <code>[ ~/.tmux.conf Editor ]</code> tab) and add <code>setw -g mode-keys vi</code> along with <code>set -g mouse on</code> and <code>set -g base-index 1</code>, then reload (<code>tmux source-file ~/.tmux.conf</code>).",
+                hint: "Add <code>setw -g mode-keys vi</code>, <code>set -g mouse on</code>, and <code>set -g base-index 1</code> to <code>~/.tmux.conf</code>, then click <strong>💾 Save &amp; Reload in tmux</strong> (or run <code>tmux source-file ~/.tmux.conf</code>).",
+                checkCmd: 'tmux show-window-options -g 2>/dev/null | grep -q "mode-keys vi" && tmux show-options -g 2>/dev/null | grep -q "mouse on" && echo OK',
+                autoSolveCmd: 'printf "setw -g mode-keys vi\\nset -g mouse on\\nset -g base-index 1\\n" >> ~/.tmux.conf && tmux source-file ~/.tmux.conf'
             },
             {
-                id: "k3-t2-rename-server",
-                description: "<strong>Rename the Active Window:</strong> Press <kbd>Ctrl+b</kbd> <kbd>,</kbd> (comma), backspace the default shell name, and name this window <code>server</code>.",
-                hint: "Press <kbd>Ctrl+b</kbd> then <kbd>,</kbd>. Clear the current window name, type <code>server</code>, and press <kbd>Enter</kbd>.",
-                checkCmd: 'tmux list-windows -F "#{window_name}" 2>/dev/null | grep -qx "server" && echo OK',
-                autoSolveCmd: 'tmux rename-window server'
+                id: "k3-t2-prefix2-ctrl-a",
+                description: "<strong>Add Secondary Prefix (<kbd>Ctrl+a</kbd>):</strong> Many practitioners find <kbd>Ctrl+b</kbd> too far to reach. Add <code>set -g prefix2 C-a</code> and <code>bind C-a send-prefix -2</code> to <code>~/.tmux.conf</code> and reload so BOTH <kbd>Ctrl+b</kbd> and <kbd>Ctrl+a</kbd> work!",
+                hint: "Add <code>set -g prefix2 C-a</code> and <code>bind C-a send-prefix -2</code> to <code>~/.tmux.conf</code> and reload with <code>tmux source-file ~/.tmux.conf</code>.",
+                checkCmd: 'tmux show-options -g prefix2 2>/dev/null | grep -q "C-a" && echo OK',
+                autoSolveCmd: 'printf "set -g prefix2 C-a\\nbind C-a send-prefix -2\\n" >> ~/.tmux.conf && tmux source-file ~/.tmux.conf'
             },
             {
-                id: "k3-t3-create-logs-window",
-                description: "<strong>Create &amp; Name a Third Window:</strong> Create another window (<kbd>Ctrl+b</kbd> <kbd>c</kbd>) and rename it (<kbd>Ctrl+b</kbd> <kbd>,</kbd>) to <code>logs</code>.",
-                hint: "Press <kbd>Ctrl+b</kbd> <kbd>c</kbd> to open a 3rd window, then press <kbd>Ctrl+b</kbd> <kbd>,</kbd>, type <code>logs</code>, and hit <kbd>Enter</kbd>.",
-                checkCmd: 'tmux list-windows -F "#{window_name}" 2>/dev/null | grep -qx "logs" && [ $(tmux list-windows 2>/dev/null | wc -l) -ge 3 ] && echo OK',
-                autoSolveCmd: 'tmux new-window -n logs'
+                id: "k3-t3-splits-current-path",
+                description: "<strong>Intuitive Splits Keeping Current Path:</strong> Bind <code>|</code> and <code>-</code> to split panes while preserving the current working directory: <code>bind | split-window -h -c \"#{pane_current_path}\"</code> and <code>bind - split-window -v -c \"#{pane_current_path}\"</code>. Reload config.",
+                hint: "Add both lines to <code>~/.tmux.conf</code> and run <code>tmux source-file ~/.tmux.conf</code>.",
+                checkCmd: 'tmux list-keys 2>/dev/null | grep -q "pane_current_path" && echo OK',
+                autoSolveCmd: 'printf "bind | split-window -h -c \\"#{pane_current_path}\\"\\nbind - split-window -v -c \\"#{pane_current_path}\\"\\n" >> ~/.tmux.conf && tmux source-file ~/.tmux.conf'
             },
             {
-                id: "k3-t4-jump-window-0",
-                description: "<strong>Jump Between Windows by Index/Cycle:</strong> Switch back to your first window (index 0) using <kbd>Ctrl+b</kbd> <kbd>0</kbd> or <kbd>Ctrl+b</kbd> <kbd>p</kbd> (previous window).",
-                hint: "Press <kbd>Ctrl+b</kbd> followed by <kbd>0</kbd> (or press <kbd>Ctrl+b</kbd> <kbd>p</kbd> until window <code>0</code> has the active <code>*</code> marker).",
-                checkCmd: 'tmux list-windows -F "#{window_index}:#{window_active}" 2>/dev/null | grep -qx "0:1" && echo OK',
-                autoSolveCmd: 'tmux select-window -t :0'
+                id: "k3-t4-bind-n-alt-arrows",
+                description: "<strong>No-Prefix Modifier (<code>bind -n</code> with <code>Alt</code>):</strong> The <code>-n</code> flag binds keys in the <em>root</em> table, meaning you don't need to press Prefix first! Add <code>bind -n M-Left select-pane -L</code> and <code>bind -n M-Right select-pane -R</code> (<code>M-</code> stands for Meta/Alt) to <code>~/.tmux.conf</code> and reload.",
+                hint: "Add <code>bind -n M-Left select-pane -L</code> and <code>bind -n M-Right select-pane -R</code> to <code>~/.tmux.conf</code> and reload.",
+                checkCmd: 'tmux list-keys -T root 2>/dev/null | grep -q "M-Left" && echo OK',
+                autoSolveCmd: 'printf "bind -n M-Left select-pane -L\\nbind -n M-Right select-pane -R\\n" >> ~/.tmux.conf && tmux source-file ~/.tmux.conf'
             },
             {
-                id: "k3-t5-break-pane",
-                description: "<strong>Break a Pane into its Own Window:</strong> Make sure Window 0 has 2 panes (split with <kbd>Ctrl+b</kbd> <kbd>%</kbd> if needed), then press <kbd>Ctrl+b</kbd> <kbd>!</kbd> (exclamation mark) to Pop/Break the active pane out into a brand-new standalone window!",
-                hint: "If Window 0 only has 1 pane, press <kbd>Ctrl+b</kbd> <kbd>%</kbd> first. Then press <kbd>Ctrl+b</kbd> followed by <kbd>!</kbd> (<kbd>Shift+1</kbd>) to promote that pane into window #4.",
-                checkCmd: '[ $(tmux list-windows 2>/dev/null | wc -l) -ge 4 ] && echo OK',
-                autoSolveCmd: 'while [ $(tmux list-windows 2>/dev/null | wc -l) -lt 4 ]; do tmux split-window -h && tmux break-pane; done'
+                id: "k3-t5-bind-r-repeatable",
+                description: "<strong>Repeatable Modifier (<code>bind -r</code> for Resizing):</strong> The <code>-r</code> flag lets you press Prefix once and then tap a key repeatedly. Add <code>bind -r H resize-pane -L 5</code> and <code>bind -r L resize-pane -R 5</code> to <code>~/.tmux.conf</code> and reload.",
+                hint: "Add <code>bind -r H resize-pane -L 5</code> and <code>bind -r L resize-pane -R 5</code> to <code>~/.tmux.conf</code> and reload.",
+                checkCmd: 'tmux list-keys 2>/dev/null | grep -E "bind-key[[:space:]]+-r.*resize-pane" && echo OK',
+                autoSolveCmd: 'printf "bind -r H resize-pane -L 5\\nbind -r L resize-pane -R 5\\n" >> ~/.tmux.conf && tmux source-file ~/.tmux.conf'
+            },
+            {
+                id: "k3-t6-sync-panes-attack",
+                description: "<strong>Synchronize Panes (Simultaneous Attack):</strong> In a window with at least 2 panes, turn on broadcast mode (<code>tmux setw synchronize-panes on</code>) and run <code>touch /tmp/purple_$$</code> so both panes create a PID-stamped file simultaneously, then turn <code>synchronize-panes off</code>.",
+                hint: "Make sure you have 2 panes, run <code>tmux setw synchronize-panes on</code>, type <code>touch /tmp/purple_$$</code>, then run <code>tmux setw synchronize-panes off</code>.",
+                checkCmd: '[ $(ls /tmp/purple_* 2>/dev/null | wc -l) -ge 2 ] && [ "$(tmux display-message -p \'#{pane_synchronized}\' 2>/dev/null)" = "0" ] && echo OK',
+                autoSolveCmd: 'touch /tmp/purple_201 /tmp/purple_202 && tmux setw synchronize-panes off'
             }
         ]
     },
 
     // ========================================================================
-    // 🟩 KATA 4: GREEN BELT (5 Tasks)
+    // 🟫 KATA 4: BROWN BELT — Customizing Your Gi (5 Tasks)
     // ========================================================================
     {
-        id: "kata-4-buffers",
+        id: "kata-4-brown-belt",
         number: "KATA 04",
-        belt: "Green Belt",
-        beltColor: "green",
-        title: "Scrollback, Copy Mode & Command Prompt (Buffers)",
-        theory: `
-            <p>
-                In <code>tmux</code>, you never need to reach for your mouse to scroll through terminal history or copy output.
-                <strong>Copy Mode</strong> (<kbd>Ctrl+b</kbd> <kbd>[</kbd>) freezes your pane so you can scroll and search through
-                thousands of lines of output, while internal <strong>paste buffers</strong> and the <strong>command prompt</strong>
-                (<kbd>Ctrl+b</kbd> <kbd>:</kbd>) let you manipulate text and run <code>tmux</code> commands directly.
-            </p>
-            <div class="theory-callout">
-                <div class="theory-callout-title">Copy Mode &amp; Buffer Keybindings</div>
-                <ul class="theory-keylist">
-                    <li><span><kbd>Ctrl+b</kbd> then <kbd>[</kbd></span> <span>Enter <strong>Copy / Scrollback Mode</strong></span></li>
-                    <li><span><kbd>q</kbd> (inside Copy Mode)</span> <span><strong>Exit</strong> Copy Mode back to live shell</span></li>
-                    <li><span><kbd>Ctrl+b</kbd> then <kbd>:</kbd></span> <span>Open the internal <code>tmux</code> <strong>Command Prompt</strong></span></li>
-                    <li><span><kbd>Ctrl+b</kbd> then <kbd>]</kbd></span> <span><strong>Paste</strong> contents of the active tmux buffer</span></li>
-                </ul>
-            </div>
-        `,
-        tasks: [
-            {
-                id: "k4-t1-enter-copy-mode",
-                description: "<strong>Generate Output &amp; Enter Copy Mode:</strong> Run <code>seq 1 100</code> in your shell to flood the screen with numbers, then press <kbd>Ctrl+b</kbd> <kbd>[</kbd> to enter <strong>Copy Mode</strong> (notice the <code>[0/xx]</code> indicator in the top-right corner of the pane).",
-                hint: "Type <code>seq 1 100</code> and press <kbd>Enter</kbd>. Then press <kbd>Ctrl+b</kbd>, release both keys, and press <kbd>[</kbd> (left square bracket).",
-                checkCmd: '[ "$(tmux display-message -p \'#{pane_in_mode}\' 2>/dev/null)" = "1" ] && echo OK',
-                autoSolveCmd: 'tmux has-session 2>/dev/null || tmux new-session -d -s dojo; tmux copy-mode'
-            },
-            {
-                id: "k4-t2-exit-copy-mode",
-                description: "<strong>Exit Copy Mode:</strong> After scrolling up/down with PageUp/PageDown or Arrow keys, press <kbd>q</kbd> to cleanly exit Copy Mode back to the live shell prompt.",
-                hint: "Simply press <kbd>q</kbd> inside the terminal pane to leave Copy Mode.",
-                checkCmd: '[ "$(tmux display-message -p \'#{pane_in_mode}\' 2>/dev/null)" = "0" ] && echo OK',
-                autoSolveCmd: 'tmux send-keys -X cancel 2>/dev/null || true'
-            },
-            {
-                id: "k4-t3-set-buffer",
-                description: "<strong>Load Text into a tmux Paste Buffer:</strong> Load a secret token into <code>tmux</code>'s internal clipboard buffer by running <code>tmux set-buffer \"DOJO_MASTER_KEY\"</code> (either in the shell or via <kbd>Ctrl+b</kbd> <kbd>:</kbd> then typing <code>set-buffer \"DOJO_MASTER_KEY\"</code>).",
-                hint: "Run <code>tmux set-buffer \"DOJO_MASTER_KEY\"</code> in the shell and press <kbd>Enter</kbd>.",
-                checkCmd: 'tmux show-buffer 2>/dev/null | grep -q "DOJO_MASTER_KEY" && echo OK',
-                autoSolveCmd: 'tmux set-buffer "DOJO_MASTER_KEY"'
-            },
-            {
-                id: "k4-t4-command-prompt-window",
-                description: "<strong>Use the Command Prompt (<kbd>Ctrl+b</kbd> <kbd>:</kbd>):</strong> Press <kbd>Ctrl+b</kbd> <kbd>:</kbd> to open the yellow <code>tmux</code> command bar at the bottom of the screen, and run <code>new-window -n \"secret\"</code> to create a window named <code>secret</code> without touching the shell.",
-                hint: "Press <kbd>Ctrl+b</kbd> then <kbd>:</kbd> (<kbd>Shift+;</kbd>). At the bottom <code>:</code> prompt, type <code>new-window -n \"secret\"</code> and press <kbd>Enter</kbd>.",
-                checkCmd: 'tmux list-windows -F "#{window_name}" 2>/dev/null | grep -qx "secret" && echo OK',
-                autoSolveCmd: 'tmux new-window -n "secret"'
-            },
-            {
-                id: "k4-t5-paste-buffer",
-                description: "<strong>Paste from Buffer (<kbd>Ctrl+b</kbd> <kbd>]</kbd>):</strong> Inside the <code>secret</code> window, type <code>echo </code> (with a space), then press <kbd>Ctrl+b</kbd> <kbd>]</kbd> to paste <code>DOJO_MASTER_KEY</code> from your tmux buffer, and redirect it to <code>/tmp/key.txt</code> (<code>echo DOJO_MASTER_KEY &gt; /tmp/key.txt</code>).",
-                hint: "Type <code>echo </code>, press <kbd>Ctrl+b</kbd> then <kbd>]</kbd> (right square bracket) to paste <code>DOJO_MASTER_KEY</code>, then type <code> &gt; /tmp/key.txt</code> and press <kbd>Enter</kbd>.",
-                checkCmd: 'grep -q "DOJO_MASTER_KEY" /tmp/key.txt 2>/dev/null && echo OK',
-                autoSolveCmd: 'echo DOJO_MASTER_KEY > /tmp/key.txt'
-            }
-        ]
-    },
-
-    // ========================================================================
-    // 🟦 KATA 5: BLUE BELT (4 Tasks)
-    // ========================================================================
-    {
-        id: "kata-5-choreography",
-        number: "KATA 05",
-        belt: "Blue Belt",
-        beltColor: "blue",
-        title: "Advanced Multi-Pane Choreography (Sync & Join)",
-        theory: `
-            <p>
-                When administering multiple servers or containers at once, <code>tmux</code>'s
-                <strong><code>synchronize-panes</code></strong> option turns your window into a broadcast console: every keystroke
-                you type is mirrored into all panes in the active window simultaneously!
-            </p>
-            <div class="theory-callout">
-                <div class="theory-callout-title">Broadcast &amp; Multi-Pane Commands</div>
-                <ul class="theory-keylist">
-                    <li><span><kbd>Ctrl+b</kbd> <kbd>:</kbd> <code>setw synchronize-panes on</code></span> <span>Broadcast keystrokes to all panes in window</span></li>
-                    <li><span><kbd>Ctrl+b</kbd> <kbd>:</kbd> <code>setw synchronize-panes off</code></span> <span>Return to normal single-pane input</span></li>
-                    <li><span><kbd>Ctrl+b</kbd> <kbd>{</kbd> / <kbd>}</kbd></span> <span>Swap active pane with previous / next pane</span></li>
-                </ul>
-            </div>
-        `,
-        tasks: [
-            {
-                id: "k5-t1-two-pane-arena",
-                description: "<strong>Prepare a 2-Pane Arena:</strong> Ensure your current window has exactly 2 panes side-by-side (use <kbd>Ctrl+b</kbd> <kbd>%</kbd> or close extra panes).",
-                hint: "If your current window has 1 pane, press <kbd>Ctrl+b</kbd> <kbd>%</kbd> to split it into 2 panes. If it has more than 2 panes, close extras with <code>exit</code>.",
-                checkCmd: '[ $(tmux list-panes 2>/dev/null | wc -l) -eq 2 ] && echo OK',
-                autoSolveCmd: 'tmux has-session 2>/dev/null || tmux new-session -d -s dojo; while [ $(tmux list-panes 2>/dev/null | wc -l) -gt 2 ]; do tmux kill-pane; done; while [ $(tmux list-panes 2>/dev/null | wc -l) -lt 2 ]; do tmux split-window -h; done'
-            },
-            {
-                id: "k5-t2-sync-on",
-                description: "<strong>Enable Synchronize-Panes (Broadcast Mode):</strong> Press <kbd>Ctrl+b</kbd> <kbd>:</kbd> and type <code>setw synchronize-panes on</code>. Now every keystroke you type goes to BOTH panes simultaneously!",
-                hint: "Press <kbd>Ctrl+b</kbd> then <kbd>:</kbd>, type <code>setw synchronize-panes on</code>, and press <kbd>Enter</kbd> (or run <code>tmux setw synchronize-panes on</code> in the shell).",
-                checkCmd: '[ "$(tmux display-message -p \'#{pane_synchronized}\' 2>/dev/null)" = "1" ] && echo OK',
-                autoSolveCmd: 'tmux setw synchronize-panes on'
-            },
-            {
-                id: "k5-t3-sync-touch",
-                description: "<strong>Execute a Synchronized Command:</strong> Type <code>touch /tmp/sync_$$</code> and hit <kbd>Enter</kbd> once. Because both panes have different shell PIDs (<code>$$</code>), two separate <code>/tmp/sync_*</code> files will be created at the exact same instant!",
-                hint: "With synchronize-panes active, type <code>touch /tmp/sync_$$</code> once and press <kbd>Enter</kbd>. Watch both panes execute the command in unison!",
-                checkCmd: '[ $(ls /tmp/sync_* 2>/dev/null | wc -l) -ge 2 ] && echo OK',
-                autoSolveCmd: 'touch /tmp/sync_101 /tmp/sync_102'
-            },
-            {
-                id: "k5-t4-sync-off",
-                description: "<strong>Disable Synchronize-Panes:</strong> Turn off broadcast mode so you don't accidentally run destructive commands everywhere (<kbd>Ctrl+b</kbd> <kbd>:</kbd> then <code>setw synchronize-panes off</code>).",
-                hint: "Press <kbd>Ctrl+b</kbd> then <kbd>:</kbd>, type <code>setw synchronize-panes off</code>, and press <kbd>Enter</kbd> (or run <code>tmux setw synchronize-panes off</code>).",
-                checkCmd: '[ "$(tmux display-message -p \'#{pane_synchronized}\' 2>/dev/null)" = "0" ] && echo OK',
-                autoSolveCmd: 'tmux setw synchronize-panes off'
-            }
-        ]
-    },
-
-    // ========================================================================
-    // 🟫 KATA 6: BROWN BELT (5 Tasks)
-    // ========================================================================
-    {
-        id: "kata-6-config",
-        number: "KATA 06",
         belt: "Brown Belt",
         beltColor: "brown",
-        title: "Forging Your Weapon (~/.tmux.conf)",
+        title: "Customizing Your Gi (Status Bar Ricing, Colors, Modifiers & Live Telemetry)",
         theory: `
             <p>
-                Out of the box, <code>tmux</code> uses conservative defaults. Building a permanent, ergonomic
-                <code>~/.tmux.conf</code> transforms <code>tmux</code> into an extension of your hands:
-            </p>
-            <ul class="theory-bullets">
-                <li><strong>Mouse Support (<code>set -g mouse on</code>):</strong> Click panes/windows, drag borders to resize, and scroll with your mouse wheel.</li>
-                <li><strong>1-Based Indexing (<code>base-index 1</code> / <code>pane-base-index 1</code>):</strong> Since <kbd>0</kbd> is on the far right of your keyboard, starting at <kbd>1</kbd> aligns window numbers with your left hand.</li>
-                <li><strong>Visual Split Keys (<code>|</code> and <code>-</code>) &amp; Hot Reload (<code>r</code>):</strong> Replace <kbd>%</kbd> and <kbd>"</kbd> with mnemonic <kbd>|</kbd> and <kbd>-</kbd> bindings, and reload configs anytime via <kbd>Prefix + r</kbd>.</li>
-            </ul>
-            <p>
-                <em>Tip:</em> You can edit <code>~/.tmux.conf</code> using <code>nano ~/.tmux.conf</code> in the terminal OR via the
-                <strong>[ ~/.tmux.conf Editor ]</strong> tab at the top of the workspace!
-            </p>
-        `,
-        tasks: [
-            {
-                id: "k6-t1-mouse-on",
-                description: "<strong>Enable Mouse Support:</strong> Create/edit <code>~/.tmux.conf</code> (via <code>nano ~/.tmux.conf</code> or the <code>[ ~/.tmux.conf Editor ]</code> tab) and add <code>set -g mouse on</code>.",
-                hint: "Run <code>echo 'set -g mouse on' &gt;&gt; ~/.tmux.conf</code> in the terminal, or add <code>set -g mouse on</code> in the <code>[ ~/.tmux.conf Editor ]</code> tab and click Save.",
-                checkCmd: 'grep -Eq "^[[:space:]]*set(-option)?[[:space:]]+-g[[:space:]]+mouse[[:space:]]+on" ~/.tmux.conf 2>/dev/null && echo OK',
-                autoSolveCmd: 'grep -Eq "^[[:space:]]*set(-option)?[[:space:]]+-g[[:space:]]+mouse[[:space:]]+on" ~/.tmux.conf 2>/dev/null || echo "set -g mouse on" >> ~/.tmux.conf'
-            },
-            {
-                id: "k6-t2-base-index",
-                description: "<strong>Human-Friendly 1-Based Indexing:</strong> Add <code>set -g base-index 1</code> and <code>setw -g pane-base-index 1</code> to <code>~/.tmux.conf</code> so windows and panes start at <code>1</code> instead of <code>0</code>.",
-                hint: "Add both <code>set -g base-index 1</code> and <code>setw -g pane-base-index 1</code> to <code>~/.tmux.conf</code>.",
-                checkCmd: 'grep -q "base-index 1" ~/.tmux.conf 2>/dev/null && grep -q "pane-base-index 1" ~/.tmux.conf 2>/dev/null && echo OK',
-                autoSolveCmd: 'grep -q "base-index 1" ~/.tmux.conf 2>/dev/null || echo "set -g base-index 1" >> ~/.tmux.conf; grep -q "pane-base-index 1" ~/.tmux.conf 2>/dev/null || echo "setw -g pane-base-index 1" >> ~/.tmux.conf'
-            },
-            {
-                id: "k6-t3-split-binds",
-                description: "<strong>Ergonomic Split Shortcuts (<code>|</code> and <code>-</code>):</strong> Add intuitive split bindings to <code>~/.tmux.conf</code>: <code>bind | split-window -h</code> and <code>bind - split-window -v</code>.",
-                hint: "Append <code>bind | split-window -h</code> and <code>bind - split-window -v</code> to <code>~/.tmux.conf</code>.",
-                checkCmd: 'grep -q "split-window -h" ~/.tmux.conf 2>/dev/null && grep -q "split-window -v" ~/.tmux.conf 2>/dev/null && echo OK',
-                autoSolveCmd: 'grep -q "split-window -h" ~/.tmux.conf 2>/dev/null || echo "bind | split-window -h" >> ~/.tmux.conf; grep -q "split-window -v" ~/.tmux.conf 2>/dev/null || echo "bind - split-window -v" >> ~/.tmux.conf'
-            },
-            {
-                id: "k6-t4-reload-bind",
-                description: "<strong>Fast Config Reload Binding (<code>Prefix + r</code>):</strong> Add <code>bind r source-file ~/.tmux.conf \\; display \"Reloaded!\"</code> to <code>~/.tmux.conf</code>.",
-                hint: "Add <code>bind r source-file ~/.tmux.conf \\; display \"Reloaded!\"</code> to <code>~/.tmux.conf</code>.",
-                checkCmd: 'grep -q "source-file ~/.tmux.conf" ~/.tmux.conf 2>/dev/null && echo OK',
-                autoSolveCmd: 'grep -q "source-file ~/.tmux.conf" ~/.tmux.conf 2>/dev/null || echo "bind r source-file ~/.tmux.conf \\; display \\"Reloaded!\\"" >> ~/.tmux.conf'
-            },
-            {
-                id: "k6-t5-apply-live",
-                description: "<strong>Apply Configuration Live:</strong> Run <code>tmux source-file ~/.tmux.conf</code> (or click \"Save &amp; Reload in tmux\" in the Config Editor tab) so the running server adopts all your new settings immediately.",
-                hint: "Run <code>tmux source-file ~/.tmux.conf</code> in the terminal or click <strong>💾 Save &amp; Reload in tmux</strong> inside the Config Editor tab.",
-                checkCmd: 'tmux show-options -g 2>/dev/null | grep -q "mouse on" && tmux show-options -g 2>/dev/null | grep -q "base-index 1" && tmux list-keys 2>/dev/null | grep -q "split-window -h" && echo OK',
-                autoSolveCmd: 'tmux has-session 2>/dev/null || tmux new-session -d -s dojo; tmux source-file ~/.tmux.conf'
-            }
-        ]
-    },
-
-    // ========================================================================
-    // 🟥 KATA 7: RED BELT (5 Tasks — Shared Sockets & Multi-User Pair Debugging)
-    // ========================================================================
-    {
-        id: "kata-7-multiuser",
-        number: "KATA 07",
-        belt: "Red Belt",
-        beltColor: "red",
-        title: "War Room & Pair Debugging (Shared Sockets & Multi-User)",
-        theory: `
-            <p>
-                By default, <code>tmux</code> creates its UNIX socket inside <code>/tmp/tmux-&lt;UID&gt;/default</code>, locked strictly to your own user account.
-                During live incident response ("war rooms") or pair programming on a shared remote server, you can launch a
-                <code>tmux</code> server on an explicit <strong>shared UNIX socket</strong> using <code>-S /tmp/pair.sock</code>.
+                <em>Philosophy:</em> A Brown Belt refines every detail. Here you master <code>tmux</code>'s status bar styling
+                engine: truecolor hex palettes (<code>#1e1e2e</code>), text attribute modifiers (<code>bold</code>, <code>underscore</code>),
+                conditional ternary expressions (<code>#{?condition,true,false}</code>), and live shell telemetry (<code>#(...)</code>).
             </p>
             <div class="theory-callout">
-                <div class="theory-callout-title">Multi-User Collaboration Primitives</div>
+                <div class="theory-callout-title">Status Bar Formatting Primitives</div>
                 <ul class="theory-keylist">
-                    <li><span><code>tmux -S /tmp/pair.sock new -s warroom</code></span> <span>Create session on an explicit socket path</span></li>
-                    <li><span><code>chgrp devops /tmp/pair.sock &amp;&amp; chmod 770 /tmp/pair.sock</code></span> <span>Grant socket access to a shared team group (or <code>chmod 777</code> in lab containers)</span></li>
-                    <li><span><code>tmux -S /tmp/pair.sock attach -t warroom -r</code></span> <span>Attach in <strong>Read-Only Spectator Mode</strong> (keystrokes won't interrupt the driver)</span></li>
-                    <li><span><code>tmux -S /tmp/pair.sock new-session -t warroom -s my-view</code></span> <span>Create an <strong>Independent Grouped Session</strong> (share windows without fighting over active window focus)</span></li>
+                    <li><span><code>#[bg=#89b4fa,fg=#11111b,bold]</code></span> <span>Inline hex colors &amp; text attribute modifiers</span></li>
+                    <li><span><code>#{?client_prefix,PREFIX,#S}</code></span> <span>Conditional ternary: reacts the instant <kbd>Ctrl+b</kbd> is pressed!</span></li>
+                    <li><span><code>#{?window_zoomed_flag, [Z],}</code></span> <span>Displays <code>[Z]</code> badge when active pane is zoomed</span></li>
+                    <li><span><code>#(cut -d' ' -f1 /proc/loadavg)</code></span> <span>Executes shell command &amp; embeds live output in the bar</span></li>
                 </ul>
             </div>
         `,
         tasks: [
             {
-                id: "k7-t1-shared-socket",
-                description: "<strong>Create a Dedicated Shared Socket (<code>-S</code>):</strong> Start a new detached session named <code>warroom</code> on a custom socket at <code>/tmp/pair.sock</code> (<code>tmux -S /tmp/pair.sock new -s warroom -d</code>).",
-                hint: "Run <code>tmux -S /tmp/pair.sock new -s warroom -d</code> in your shell. This creates the socket file <code>/tmp/pair.sock</code> and starts the <code>warroom</code> session.",
+                id: "k4-t1-status-base-palette",
+                description: "<strong>Base Status Bar Colors &amp; Position:</strong> Style the base status bar palette by setting <code>set -g status-style \"bg=#1e1e2e,fg=#cdd6f4\"</code> in <code>~/.tmux.conf</code> and reloading.",
+                hint: "Add <code>set -g status-style \"bg=#1e1e2e,fg=#cdd6f4\"</code> to <code>~/.tmux.conf</code> and run <code>tmux source-file ~/.tmux.conf</code> (or click Save &amp; Reload in the Editor tab).",
+                checkCmd: 'tmux show-options -g status-style 2>/dev/null | grep -qi "#1e1e2e" && echo OK',
+                autoSolveCmd: 'printf "set -g status-style \\"bg=#1e1e2e,fg=#cdd6f4\\"\\n" >> ~/.tmux.conf && tmux source-file ~/.tmux.conf'
+            },
+            {
+                id: "k4-t2-pane-border-highlighting",
+                description: "<strong>Pane Border Highlighting:</strong> Make the active pane border stand out starkly from inactive panes by setting <code>set -g pane-active-border-style \"fg=#a6e3a1,bold\"</code> and <code>set -g pane-border-style \"fg=#45475a\"</code>, then reload.",
+                hint: "Add both <code>pane-active-border-style</code> and <code>pane-border-style</code> lines to <code>~/.tmux.conf</code> and reload.",
+                checkCmd: 'tmux show-options -g pane-active-border-style 2>/dev/null | grep -qi "#a6e3a1" && echo OK',
+                autoSolveCmd: 'printf "set -g pane-active-border-style \\"fg=#a6e3a1,bold\\"\\nset -g pane-border-style \\"fg=#45475a\\"\\n" >> ~/.tmux.conf && tmux source-file ~/.tmux.conf'
+            },
+            {
+                id: "k4-t3-window-tab-modifiers",
+                description: "<strong>Window Tab Styling with Attribute Modifiers:</strong> Style the active window tab using <code>setw -g window-status-current-style \"bg=#89b4fa,fg=#11111b,bold\"</code> and set its format to show index, name, and zoom flag: <code>setw -g window-status-current-format \" #I:#W#{?window_zoomed_flag, [Z],} \"</code>. Reload config.",
+                hint: "Add both <code>window-status-current-style</code> and <code>window-status-current-format</code> to <code>~/.tmux.conf</code> and reload.",
+                checkCmd: 'tmux show-window-options -g window-status-current-format 2>/dev/null | grep -q "window_zoomed_flag" && echo OK',
+                autoSolveCmd: 'printf "setw -g window-status-current-style \\"bg=#89b4fa,fg=#11111b,bold\\"\\nsetw -g window-status-current-format \\" #I:#W#{?window_zoomed_flag, [Z],} \\"\\n" >> ~/.tmux.conf && tmux source-file ~/.tmux.conf'
+            },
+            {
+                id: "k4-t4-conditional-prefix-indicator",
+                description: "<strong>Conditional Prefix Indicator (<code>#{?client_prefix,...}</code>):</strong> Make <code>status-left</code> change color dynamically the exact millisecond you press <kbd>Ctrl+b</kbd>! Set:<br/><code>set -g status-left \"#{?client_prefix,#[bg=#f38ba8 fg=#11111b bold] PREFIX #[default],#[bg=#a6e3a1 fg=#11111b bold] #S #[default]} \"</code> and reload.",
+                hint: "Add the <code>set -g status-left ...</code> line to <code>~/.tmux.conf</code> and reload. Then press <kbd>Ctrl+b</kbd> in the terminal and watch the bottom-left badge turn bright pink/red!",
+                checkCmd: 'tmux show-options -g status-left 2>/dev/null | grep -q "client_prefix" && echo OK',
+                autoSolveCmd: 'printf "set -g status-left \\"#{?client_prefix,#[bg=#f38ba8 fg=#11111b bold] PREFIX #[default],#[bg=#a6e3a1 fg=#11111b bold] #S #[default]} \\"\\n" >> ~/.tmux.conf && tmux source-file ~/.tmux.conf'
+            },
+            {
+                id: "k4-t5-live-telemetry-status-right",
+                description: "<strong>Live System Telemetry in <code>status-right</code> (<code>#(...)</code> Shell Execution):</strong> Set <code>set -g status-interval 2</code> and configure <code>status-right</code> to display the active command, CPU load average from <code>/proc/loadavg</code>, and time:<br/><code>set -g status-right \"#[fg=#f9e2af]CMD:#{pane_current_command} #[fg=#89b4fa]| LOAD:#(cut -d' ' -f1 /proc/loadavg) #[fg=#cdd6f4]| %H:%M \"</code> and reload.",
+                hint: "Add <code>set -g status-interval 2</code> and the <code>set -g status-right ...</code> line to <code>~/.tmux.conf</code> and reload.",
+                checkCmd: 'tmux show-options -g status-right 2>/dev/null | grep -q "/proc/loadavg" && tmux show-options -g status-right 2>/dev/null | grep -q "pane_current_command" && echo OK',
+                autoSolveCmd: 'printf "set -g status-interval 2\\nset -g status-right \\"#[fg=#f9e2af]CMD:#{pane_current_command} #[fg=#89b4fa]| LOAD:#(cut -d\' \' -f1 /proc/loadavg) #[fg=#cdd6f4]| %%H:%%M \\"\\n" >> ~/.tmux.conf && tmux source-file ~/.tmux.conf'
+            }
+        ]
+    },
+
+    // ========================================================================
+    // ⬛ KATA 5: BLACK BELT — Team Ops, Shared Sockets & Automation (6 Tasks)
+    // ========================================================================
+    {
+        id: "kata-5-black-belt",
+        number: "KATA 05",
+        belt: "Black Belt",
+        beltColor: "black",
+        title: "Team Ops, Shared Sockets & Automation (Multi-User & Scripting)",
+        theory: `
+            <p>
+                <em>Philosophy:</em> A Black Belt leads the room. In production engineering, that means hosting multi-user
+                War Rooms over shared UNIX sockets (<code>-S</code>), controlling read-only spectator vs. read-write access,
+                linking grouped sessions so teammates don't fight over window focus, and scripting entire workspaces.
+            </p>
+            <div class="theory-callout">
+                <div class="theory-callout-title">Multi-User War Room &amp; Automation Commands</div>
+                <ul class="theory-keylist">
+                    <li><span><code>tmux -S /tmp/pair.sock new -s warroom -d</code></span> <span>Create session on explicit shared socket</span></li>
+                    <li><span><code>chmod 777 /tmp/pair.sock</code></span> <span>Unlock socket permissions for user <code>teammate</code></span></li>
+                    <li><span><code>tmux -S /tmp/pair.sock attach -t warroom -r</code></span> <span>Shadow in <strong>Read-Only</strong> mode</span></li>
+                    <li><span><code>tmux -S /tmp/pair.sock new -t warroom -s my-angle -d</code></span> <span>Create linked session with independent window focus</span></li>
+                </ul>
+            </div>
+        `,
+        tasks: [
+            {
+                id: "k5-t1-shared-socket",
+                description: "<strong>Create a Shared Team Socket (<code>-S</code>):</strong> Start a detached session named <code>warroom</code> on an explicit socket <code>/tmp/pair.sock</code> (<code>tmux -S /tmp/pair.sock new -s warroom -d</code>).",
+                hint: "Run <code>tmux -S /tmp/pair.sock new -s warroom -d</code> in your shell.",
                 checkCmd: '[ -S /tmp/pair.sock ] && tmux -S /tmp/pair.sock has-session -t warroom 2>/dev/null && echo OK',
                 onPassCmd: 'tmux -S /tmp/pair.sock server-access -a teammate 2>/dev/null || true',
                 autoSolveCmd: 'tmux -S /tmp/pair.sock has-session -t warroom 2>/dev/null || tmux -S /tmp/pair.sock new-session -d -s warroom'
             },
             {
-                id: "k7-t2-socket-perms",
-                description: "<strong>Unlock Socket Permissions for Your Team (<code>chmod</code> / <code>chgrp</code>):</strong> Grant group/world read-write-execute permissions to <code>/tmp/pair.sock</code> (<code>chmod 777 /tmp/pair.sock</code> or <code>chgrp devops /tmp/pair.sock &amp;&amp; chmod 770 /tmp/pair.sock</code>) so user <code>teammate</code> can connect.",
-                hint: "Run <code>chmod 777 /tmp/pair.sock</code> (or <code>chgrp devops /tmp/pair.sock &amp;&amp; chmod 770 /tmp/pair.sock</code>) so non-root user <code>teammate</code> can access the socket.",
+                id: "k5-t2-socket-permissions",
+                description: "<strong>Configure Multi-User Socket Permissions (<code>chmod</code> / <code>chgrp</code>):</strong> Unlock <code>/tmp/pair.sock</code> (<code>chmod 777 /tmp/pair.sock</code> or group <code>devops</code> with <code>770</code>) so user <code>teammate</code> can inspect the server.",
+                hint: "Run <code>chmod 777 /tmp/pair.sock</code> (or <code>chgrp devops /tmp/pair.sock &amp;&amp; chmod 770 /tmp/pair.sock</code>).",
                 checkCmd: 'tmux -S /tmp/pair.sock server-access -a teammate 2>/dev/null || true; su - teammate -c "tmux -S /tmp/pair.sock list-sessions" >/dev/null 2>&1 && echo OK',
                 autoSolveCmd: 'chgrp devops /tmp/pair.sock 2>/dev/null || true; chmod 777 /tmp/pair.sock'
             },
             {
-                id: "k7-t3-attach-readonly",
-                description: "<strong>Attach in Read-Only / Spectator Mode (<code>-r</code>):</strong> Attach to the <code>warroom</code> session on <code>/tmp/pair.sock</code> in <strong>Read-Only mode</strong> (<code>tmux -S /tmp/pair.sock attach -t warroom -r</code>). <em>(If you are currently inside another tmux session, detach first with <kbd>Ctrl+b</kbd> <kbd>d</kbd>.)</em>",
-                hint: "If you are inside an existing tmux session, press <kbd>Ctrl+b</kbd> <kbd>d</kbd> to return to the host shell first, then run <code>tmux -S /tmp/pair.sock attach -t warroom -r</code>.",
+                id: "k5-t3-shadow-readonly",
+                description: "<strong>Shadowing in Read-Only Mode (<code>attach -r</code>):</strong> Attach to <code>warroom</code> on <code>/tmp/pair.sock</code> with the <code>-r</code> flag so your keystrokes cannot disrupt the session (<code>tmux -S /tmp/pair.sock attach -t warroom -r</code>).",
+                hint: "If you are currently inside another tmux session, press <kbd>Ctrl+b</kbd> <kbd>d</kbd> first, then run <code>tmux -S /tmp/pair.sock attach -t warroom -r</code>.",
                 checkCmd: 'tmux -S /tmp/pair.sock list-clients -F "#{client_readonly}" 2>/dev/null | grep -qx "1" && echo OK',
                 autoSteps: [
                     {
@@ -516,9 +498,9 @@ const TMUX_DOJO_KATAS = [
                 ]
             },
             {
-                id: "k7-t4-pair-readwrite",
-                description: "<strong>Simulate Live Pair-Debugging (Switch to Full Access &amp; Receive Teammate Input):</strong> Detach (<kbd>Ctrl+b</kbd> <kbd>d</kbd>) and re-attach to <code>warroom</code> on <code>/tmp/pair.sock</code> in normal read-write mode without <code>-r</code> (<code>tmux -S /tmp/pair.sock attach -t warroom</code>). Watch your colleague <code>teammate</code> type a live message into your shared terminal!",
-                hint: "Press <kbd>Ctrl+b</kbd> then <kbd>d</kbd> to detach from read-only mode, then run <code>tmux -S /tmp/pair.sock attach -t warroom</code>.",
+                id: "k5-t4-pair-debugging-live",
+                description: "<strong>Live Pair-Debugging (Full Read-Write + Teammate Interaction):</strong> Detach (<kbd>Ctrl+b</kbd> <kbd>d</kbd>) and re-attach without <code>-r</code> (<code>tmux -S /tmp/pair.sock attach -t warroom</code>). Watch user <code>teammate</code> send a live greeting into your shared session!",
+                hint: "Press <kbd>Ctrl+b</kbd> <kbd>d</kbd> to detach, then run <code>tmux -S /tmp/pair.sock attach -t warroom</code>.",
                 checkCmd: 'tmux -S /tmp/pair.sock list-clients -F "#{client_readonly}" 2>/dev/null | grep -qx "0" && echo OK',
                 onPassCmd: 'tmux -S /tmp/pair.sock server-access -a teammate 2>/dev/null || true; su - teammate -c "tmux -S /tmp/pair.sock send-keys -t warroom \'# 👋 Hey from teammate! I am connected to /tmp/pair.sock!\' C-m"',
                 autoSteps: [
@@ -533,64 +515,88 @@ const TMUX_DOJO_KATAS = [
                 ]
             },
             {
-                id: "k7-t5-grouped-session",
-                description: "<strong>Grouped Sessions — Independent Window Focus (<code>new-session -t</code>):</strong> Create a grouped session named <code>my-view</code> linked to the <code>warroom</code> session on <code>/tmp/pair.sock</code> so both engineers share windows without dragging each other's active window focus (<code>tmux -S /tmp/pair.sock new -t warroom -s my-view -d</code>).",
-                hint: "Run <code>tmux -S /tmp/pair.sock new -t warroom -s my-view -d</code> (either inside your shell pane or from outside tmux).",
-                checkCmd: 'tmux -S /tmp/pair.sock list-sessions -F "#{session_name}:#{session_group}" 2>/dev/null | grep -E "^my-view:.+" && echo OK',
-                autoSolveCmd: 'tmux -S /tmp/pair.sock has-session -t my-view 2>/dev/null || tmux -S /tmp/pair.sock new-session -d -t warroom -s my-view'
+                id: "k5-t5-grouped-my-angle",
+                description: "<strong>Grouped Sessions for Independent Views (<code>new-session -t</code>):</strong> Create a linked session named <code>my-angle</code> attached to group <code>warroom</code> on <code>/tmp/pair.sock</code> (<code>tmux -S /tmp/pair.sock new -t warroom -s my-angle -d</code>) so two engineers share windows without dragging each other's active window focus.",
+                hint: "Run <code>tmux -S /tmp/pair.sock new -t warroom -s my-angle -d</code>.",
+                checkCmd: 'tmux -S /tmp/pair.sock list-sessions -F "#{session_name}:#{session_group}" 2>/dev/null | grep -E "^my-angle:.+" && echo OK',
+                autoSolveCmd: 'tmux -S /tmp/pair.sock has-session -t my-angle 2>/dev/null || tmux -S /tmp/pair.sock new-session -d -t warroom -s my-angle'
+            },
+            {
+                id: "k5-t6-deploy-dojo-script",
+                description: "<strong>Automated Workspace Scripting:</strong> Write an executable script <code>/root/deploy-dojo.sh</code> (or run a chained command) that builds a multi-window session named <code>hq</code> with window <code>code</code> split into 2 panes and a second window named <code>logs</code>, completely non-interactively (<code>tmux new-session -d -s hq -n code \\; split-window -h \\; new-window -n logs</code>).",
+                hint: "Run <code>tmux new-session -d -s hq -n code \\; split-window -h \\; new-window -n logs</code> in your shell.",
+                checkCmd: 'tmux has-session -t hq 2>/dev/null && tmux list-windows -t hq -F "#{window_name}" | grep -qx "logs" && [ $(tmux list-panes -t hq:code 2>/dev/null | wc -l) -eq 2 ] && echo OK',
+                autoSolveCmd: 'printf "#!/bin/sh\\ntmux kill-session -t hq 2>/dev/null || true\\ntmux new-session -d -s hq -n code \\\\; split-window -h \\\\; new-window -n logs\\n" > /root/deploy-dojo.sh && chmod +x /root/deploy-dojo.sh && /root/deploy-dojo.sh'
             }
         ]
     },
 
     // ========================================================================
-    // ⬛ KATA 8: BLACK BELT (2 Tasks + Master Cheat Sheet + Sensei Config Injector)
+    // 🟥⬛ KATA 6: CORAL BELT — Open Mat (Sandbox, Theme Gallery & Master Cheat Sheet)
     // ========================================================================
     {
-        id: "kata-8-mastery",
-        number: "KATA 08",
-        belt: "Black Belt",
-        beltColor: "black",
-        title: "Automation, Status Bar Styling & Sandbox (Mastery)",
+        id: "kata-6-coral-belt",
+        number: "KATA 06",
+        belt: "Coral Belt",
+        beltColor: "coral",
+        title: "Open Mat (Sandbox, Theme Gallery & Master Cheat Sheet)",
+        isSandbox: true,
         hasSandboxExtras: true,
         theory: `
             <p>
-                Welcome to the Black Belt Dojo! True <code>tmux</code> mastery means treating your terminal layout as
-                <strong>code</strong>: styling your status bar for instant situational awareness and scripting multi-window,
-                multi-pane project workspaces that spin up in milliseconds.
+                <em>Oss!</em> You have progressed from White Belt survival to Black Belt multi-user War Rooms and workspace
+                automation. Welcome to <strong>Coral Belt Open Mat</strong>—experiment freely with the 3 one-click
+                <code>~/.tmux.conf</code> themes below, inspect them in the <strong>[ ~/.tmux.conf Editor ]</strong> tab,
+                or use the Master Cheat Sheet as your permanent reference.
             </p>
-            <div class="theory-callout">
-                <div class="theory-callout-title">Scripting tmux Workspaces</div>
-                <p>
-                    Because every <code>tmux</code> action is a CLI subcommand, you can chain commands with <code>\\;</code> or script them in bash:
-                    <br />
-                    <code>tmux new-session -d -s prod -n monitor \\; split-window -h</code>
-                </p>
-            </div>
         `,
-        tasks: [
-            {
-                id: "k8-t1-status-style",
-                description: "<strong>Customize the Status Bar Style:</strong> Configure your status bar colors by adding <code>set -g status-style bg=black,fg=green</code> to <code>~/.tmux.conf</code> and reloading (<code>tmux source-file ~/.tmux.conf</code>).",
-                hint: "Run <code>echo 'set -g status-style bg=black,fg=green' &gt;&gt; ~/.tmux.conf &amp;&amp; tmux source-file ~/.tmux.conf</code> (or use the Config Editor tab).",
-                checkCmd: '(tmux show-options -g status-style 2>/dev/null; tmux -S /tmp/pair.sock show-options -g status-style 2>/dev/null) | grep -q "bg=black" && echo OK',
-                autoSolveCmd: 'tmux has-session 2>/dev/null || tmux new-session -d -s dojo; grep -q "status-style bg=black,fg=green" ~/.tmux.conf 2>/dev/null || echo "set -g status-style bg=black,fg=green" >> ~/.tmux.conf; tmux source-file ~/.tmux.conf 2>/dev/null || true; tmux -S /tmp/pair.sock source-file ~/.tmux.conf 2>/dev/null || true'
-            },
-            {
-                id: "k8-t2-script-workspace",
-                description: "<strong>Script an Automated Project Workspace:</strong> Write an executable script <code>/root/start-dev.sh</code> (or run a one-liner) that programmatically spins up a detached session named <code>prod</code> with a window named <code>monitor</code> and splits it into 2 panes (<code>tmux new-session -d -s prod -n monitor \\; split-window -h</code>).",
-                hint: "Run <code>tmux new-session -d -s prod -n monitor \\; split-window -h</code> in your shell (or save it into <code>/root/start-dev.sh</code> and run <code>sh /root/start-dev.sh</code>).",
-                checkCmd: 'tmux has-session -t prod 2>/dev/null && tmux list-windows -t prod -F "#{window_name}" | grep -qx "monitor" && [ $(tmux list-panes -t prod:monitor 2>/dev/null | wc -l) -eq 2 ] && echo OK',
-                autoSolveCmd: 'printf "#!/bin/sh\\ntmux kill-session -t prod 2>/dev/null || true\\ntmux new-session -d -s prod -n monitor \\\\; split-window -h\\n" > /root/start-dev.sh && chmod +x /root/start-dev.sh && /root/start-dev.sh'
-            }
-        ],
+        tasks: [],
         sandboxFooterHtml: `
-            <div class="sandbox-action-box">
-                <p class="sandbox-action-desc">
-                    Want to load Sensei's complete, battle-tested <code>~/.tmux.conf</code> (mouse mode, 1-based indexing, <kbd>Prefix + |</kbd> &amp; <kbd>Prefix + -</kbd> splits, <kbd>Prefix + r</kbd> reload, and styled status bar)?
-                </p>
-                <button id="inject-sensei-conf-btn" class="inject-sensei-btn" type="button">
-                    ⚡ Inject Sensei's Recommended ~/.tmux.conf
-                </button>
+            <div class="theme-gallery-card">
+                <div class="theme-gallery-header">
+                    <span class="theme-gallery-title">🎨 One-Click ~/.tmux.conf Theme Gallery</span>
+                    <span class="theme-gallery-sub">Applies &amp; hot-reloads live via ttyS1</span>
+                </div>
+                <div class="theme-preset-grid">
+                    <button type="button" class="theme-preset-btn" data-theme-key="catppuccin">
+                        <div class="theme-preset-top">
+                            <span class="theme-swatches">
+                                <span style="background:#1e1e2e"></span>
+                                <span style="background:#a6e3a1"></span>
+                                <span style="background:#89b4fa"></span>
+                                <span style="background:#f38ba8"></span>
+                            </span>
+                            <strong>1. Catppuccin Mocha Dojo</strong>
+                        </div>
+                        <p>Modern dark pastel with dynamic Red/Green Prefix badge &amp; live CPU load</p>
+                    </button>
+
+                    <button type="button" class="theme-preset-btn" data-theme-key="matrix">
+                        <div class="theme-preset-top">
+                            <span class="theme-swatches">
+                                <span style="background:#000000"></span>
+                                <span style="background:#00ff66"></span>
+                                <span style="background:#008833"></span>
+                                <span style="background:#ff0055"></span>
+                            </span>
+                            <strong>2. Cyberpunk Matrix</strong>
+                        </div>
+                        <p>High-contrast neon phosphor green on pure black with minimal borders</p>
+                    </button>
+
+                    <button type="button" class="theme-preset-btn" data-theme-key="zen">
+                        <div class="theme-preset-top">
+                            <span class="theme-swatches">
+                                <span style="background:#0e141f"></span>
+                                <span style="background:#647792"></span>
+                                <span style="background:#9fb0c7"></span>
+                                <span style="background:#f59e0b"></span>
+                            </span>
+                            <strong>3. Minimalist Zen</strong>
+                        </div>
+                        <p>Distraction-free top status bar with muted slate &amp; monochrome typography</p>
+                    </button>
+                </div>
                 <div id="inject-sensei-feedback" class="inject-sensei-feedback" aria-live="polite"></div>
             </div>
 
@@ -599,58 +605,42 @@ const TMUX_DOJO_KATAS = [
                     <h4>Sessions &amp; Server</h4>
                     <ul class="theory-keylist">
                         <li><span><code>tmux new -s name</code></span> <span>Start named session</span></li>
-                        <li><span><code>tmux new -s name -d</code></span> <span>Start detached session in background</span></li>
-                        <li><span><code>tmux ls</code> / <kbd>Ctrl+b</kbd> <kbd>s</kbd></span> <span>List / interactively pick sessions</span></li>
-                        <li><span><code>tmux a -t name</code></span> <span>Attach to named session</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>d</kbd></span> <span>Detach from current session</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>$</kbd></span> <span>Rename current session</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>(</kbd> / <kbd>)</kbd></span> <span>Switch to previous / next session</span></li>
+                        <li><span><code>tmux new -s name -d</code></span> <span>Start detached background session</span></li>
+                        <li><span><kbd>Ctrl+b</kbd> <kbd>$</kbd></span> <span>Rename active session</span></li>
+                        <li><span><kbd>Ctrl+b</kbd> <kbd>d</kbd></span> <span>Detach from session</span></li>
+                        <li><span><kbd>Ctrl+b</kbd> <kbd>s</kbd></span> <span>Interactive session tree chooser</span></li>
                     </ul>
                 </div>
 
                 <div class="cheatsheet-section">
-                    <h4>Panes &amp; Spatial Control</h4>
+                    <h4>Panes &amp; Windows</h4>
                     <ul class="theory-keylist">
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>%</kbd></span> <span>Split vertically (left/right)</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>"</kbd></span> <span>Split horizontally (top/bottom)</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>Arrows</kbd> / <kbd>o</kbd></span> <span>Move focus between panes</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>z</kbd></span> <span>Toggle pane zoom (Monocle fullscreen)</span></li>
+                        <li><span><kbd>Ctrl+b</kbd> <kbd>%</kbd> / <kbd>"</kbd></span> <span>Split vertically / horizontally</span></li>
+                        <li><span><kbd>Ctrl+b</kbd> <kbd>z</kbd></span> <span>Toggle pane Monocle Zoom</span></li>
                         <li><span><kbd>Ctrl+b</kbd> <kbd>Space</kbd></span> <span>Cycle preset pane layouts</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>{</kbd> / <kbd>}</kbd></span> <span>Swap active pane left / right</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>x</kbd></span> <span>Close active pane</span></li>
+                        <li><span><kbd>Ctrl+b</kbd> <kbd>c</kbd> / <kbd>,</kbd></span> <span>Create / Rename window</span></li>
+                        <li><span><kbd>Ctrl+b</kbd> <kbd>!</kbd></span> <span>Break pane into standalone window</span></li>
                     </ul>
                 </div>
 
                 <div class="cheatsheet-section">
-                    <h4>Windows (Virtual Tabs)</h4>
+                    <h4>Keybinding Modifiers &amp; Vi Mode</h4>
                     <ul class="theory-keylist">
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>c</kbd></span> <span>Create new window</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>,</kbd></span> <span>Rename active window</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>n</kbd> / <kbd>p</kbd></span> <span>Next / Previous window</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>0</kbd>–<kbd>9</kbd></span> <span>Jump directly to window by number</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>!</kbd></span> <span>Break active pane into its own window</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>w</kbd></span> <span>Visual window &amp; pane tree</span></li>
+                        <li><span><code>setw -g mode-keys vi</code></span> <span>Enable Vi navigation in Copy Mode (<kbd>Ctrl+b</kbd> <kbd>[</kbd>)</span></li>
+                        <li><span><code>set -g prefix2 C-a</code></span> <span>Add secondary <kbd>Ctrl+a</kbd> prefix</span></li>
+                        <li><span><code>bind -n M-Left select-pane -L</code></span> <span>Root table (<code>-n</code>): switch panes with <kbd>Alt+Left</kbd></span></li>
+                        <li><span><code>bind -r H resize-pane -L 5</code></span> <span>Repeatable (<code>-r</code>): tap <kbd>H</kbd> repeatedly to resize</span></li>
                     </ul>
                 </div>
 
                 <div class="cheatsheet-section">
-                    <h4>Copy Mode, Buffers &amp; Broadcast</h4>
+                    <h4>Status Bar Telemetry &amp; Multi-User</h4>
                     <ul class="theory-keylist">
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>[</kbd></span> <span>Enter Copy/Scroll mode (<kbd>q</kbd> to exit)</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>]</kbd></span> <span>Paste from active tmux buffer</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>:</kbd></span> <span>Open internal tmux command prompt</span></li>
-                        <li><span><code>:setw synchronize-panes on</code></span> <span>Broadcast typing to all panes in window</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>?</kbd></span> <span>List all active keybindings</span></li>
-                    </ul>
-                </div>
-
-                <div class="cheatsheet-section">
-                    <h4>Multi-User / Shared Socket (<code>-S</code>)</h4>
-                    <ul class="theory-keylist">
-                        <li><span><code>tmux -S /tmp/shared.sock new -s warroom</code></span> <span>Create session on shared socket path</span></li>
-                        <li><span><code>chgrp devops /tmp/shared.sock &amp;&amp; chmod 770 /tmp/shared.sock</code></span> <span>Grant team group access to socket</span></li>
-                        <li><span><code>tmux -S /tmp/shared.sock attach -t warroom -r</code></span> <span>Attach in Read-Only spectator mode</span></li>
-                        <li><span><code>tmux -S /tmp/shared.sock new-session -t warroom -s view2</code></span> <span>Grouped session with independent window focus</span></li>
+                        <li><span><code>#{?client_prefix,PREFIX,#S}</code></span> <span>Dynamic conditional Prefix indicator</span></li>
+                        <li><span><code>#(cut -d' ' -f1 /proc/loadavg)</code></span> <span>Embed live shell telemetry in bar</span></li>
+                        <li><span><code>tmux -S /tmp/pair.sock new -s warroom</code></span> <span>Create shared multi-user socket</span></li>
+                        <li><span><code>tmux -S /tmp/pair.sock attach -r</code></span> <span>Shadow session in Read-Only mode</span></li>
+                        <li><span><code>tmux -S /tmp/pair.sock new -t warroom -s view2</code></span> <span>Grouped session with independent window focus</span></li>
                     </ul>
                 </div>
             </div>
@@ -658,6 +648,7 @@ const TMUX_DOJO_KATAS = [
     }
 ];
 
+window.TMUX_DOJO_THEMES = TMUX_DOJO_THEMES;
 window.TMUX_DOJO_KATAS = TMUX_DOJO_KATAS;
 window.SENSEI_RECOMMENDED_TMUX_CONF = SENSEI_RECOMMENDED_TMUX_CONF;
 // @license-end

@@ -132,13 +132,16 @@ body {
 }
 
 .belt-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     font-family: var(--font-mono);
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 4px 10px;
-    border-radius: 999px;
+    letter-spacing: 0.05em;
+    padding: 4px 8px 4px 10px;
+    border-radius: 6px;
     background-color: rgba(238, 244, 252, 0.08);
     border: 1px solid var(--border-strong);
     color: var(--text-primary);
@@ -146,52 +149,210 @@ body {
 }
 
 .belt-badge.belt-white {
-    background-color: rgba(238, 244, 252, 0.1);
-    border-color: #cbd5e1;
+    background-color: rgba(248, 250, 252, 0.14);
+    border-color: #e2e8f0;
     color: #f8fafc;
 }
 
-.belt-badge.belt-yellow {
-    background-color: rgba(250, 204, 21, 0.16);
-    border-color: #eab308;
-    color: #fef08a;
-}
-
-.belt-badge.belt-orange {
-    background-color: rgba(249, 115, 22, 0.18);
-    border-color: #f97316;
-    color: #fed7aa;
-}
-
-.belt-badge.belt-green {
-    background-color: rgba(34, 197, 94, 0.15);
-    border-color: var(--accent-green);
-    color: #86efac;
-}
-
 .belt-badge.belt-blue {
-    background-color: rgba(59, 130, 246, 0.18);
+    background-color: rgba(37, 99, 235, 0.26);
     border-color: #3b82f6;
-    color: #bfdbfe;
+    color: #dbeafe;
+}
+
+.belt-badge.belt-purple {
+    background-color: rgba(126, 34, 206, 0.28);
+    border-color: #a855f7;
+    color: #f3e8ff;
 }
 
 .belt-badge.belt-brown {
-    background-color: rgba(180, 83, 9, 0.22);
-    border-color: #b45309;
-    color: #fde68a;
-}
-
-.belt-badge.belt-red {
-    background-color: rgba(239, 68, 68, 0.18);
-    border-color: #ef4444;
-    color: #fecaca;
+    background-color: rgba(146, 64, 14, 0.34);
+    border-color: #d97706;
+    color: #fef3c7;
 }
 
 .belt-badge.belt-black {
-    background-color: #05080d;
-    border-color: var(--accent-cyan);
-    color: var(--accent-cyan);
-    box-shadow: 0 0 10px var(--accent-cyan-glow);
+    background-color: #070a10;
+    border-color: #ef4444;
+    color: #f8fafc;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.28);
+}
+
+.belt-badge.belt-coral {
+    background: repeating-linear-gradient(
+        90deg,
+        rgba(220, 38, 38, 0.38) 0px,
+        rgba(220, 38, 38, 0.38) 12px,
+        rgba(10, 14, 23, 0.92) 12px,
+        rgba(10, 14, 23, 0.92) 24px
+    );
+    border-color: #f87171;
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+}
+
+/* Compact BJJ Rank Bar (Ponta Preta / Red Bar) inside top badge */
+.bjj-ponta {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    height: 16px;
+    padding: 2px 5px;
+    border-radius: 3px;
+    background-color: #06080d;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.bjj-ponta.ponta-black {
+    background-color: #b91c1c;
+    border-color: #f87171;
+}
+
+.bjj-ponta.ponta-coral {
+    background-color: #06080d;
+    border-color: #fbbf24;
+}
+
+/* Full-width Visual BJJ Belt Banner in Kata Header */
+.bjj-belt-banner {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-strong);
+    min-height: 46px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.bjj-belt-stitch {
+    position: absolute;
+    inset: 4px 0;
+    border-top: 1px dashed rgba(255, 255, 255, 0.18);
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.18);
+    pointer-events: none;
+}
+
+.belt-fabric-white {
+    background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%);
+    border-color: #f8fafc;
+    color: #0f172a;
+}
+
+.belt-fabric-white .bjj-belt-stitch {
+    border-color: rgba(15, 23, 42, 0.22);
+}
+
+.belt-fabric-blue {
+    background: linear-gradient(180deg, #1d4ed8 0%, #1e3a8a 100%);
+    border-color: #60a5fa;
+    color: #f8fafc;
+}
+
+.belt-fabric-purple {
+    background: linear-gradient(180deg, #7e22ce 0%, #581c87 100%);
+    border-color: #c084fc;
+    color: #faf5ff;
+}
+
+.belt-fabric-brown {
+    background: linear-gradient(180deg, #78350f 0%, #451a03 100%);
+    border-color: #d97706;
+    color: #fef3c7;
+}
+
+.belt-fabric-black {
+    background: linear-gradient(180deg, #111827 0%, #030712 100%);
+    border-color: #ef4444;
+    color: #f8fafc;
+}
+
+.belt-fabric-coral {
+    background: repeating-linear-gradient(
+        90deg,
+        #b91c1c 0px,
+        #b91c1c 26px,
+        #090d14 26px,
+        #090d14 52px
+    );
+    border-color: #f87171;
+    color: #ffffff;
+}
+
+.bjj-belt-info {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 7px 14px;
+    gap: 2px;
+}
+
+.belt-fabric-coral .bjj-belt-info {
+    background: rgba(9, 13, 20, 0.78);
+    backdrop-filter: blur(2px);
+    border-right: 1px solid rgba(248, 113, 113, 0.35);
+}
+
+.bjj-belt-rank-title {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+}
+
+.bjj-belt-stripes-text {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    opacity: 0.9;
+}
+
+/* Rank Bar (Ponta) with White Stripes (Trese) */
+.bjj-ponta-bar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: stretch;
+    gap: 5px;
+    padding: 5px 12px;
+    background-color: #05070b;
+    border-left: 2px solid rgba(255, 255, 255, 0.25);
+    min-width: 86px;
+    justify-content: center;
+}
+
+.bjj-ponta-bar.ponta-black {
+    background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
+    border-left: 3px solid #ffffff;
+    border-right: 3px solid #ffffff;
+}
+
+.bjj-ponta-bar.ponta-coral {
+    background-color: #05070b;
+    border-left: 2px solid #fbbf24;
+}
+
+.bjj-stripe {
+    width: 6px;
+    height: 100%;
+    border-radius: 1px;
+    background-color: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.25s ease;
+}
+
+.bjj-ponta .bjj-stripe {
+    width: 4px;
+    height: 10px;
+}
+
+.bjj-stripe.earned {
+    background-color: #ffffff;
+    border-color: #ffffff;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.85);
 }
 
 .kata-progress-bar {
@@ -638,13 +799,14 @@ kbd {
 }
 
 .belt-dot-white { background-color: #f8fafc; }
-.belt-dot-yellow { background-color: #eab308; }
-.belt-dot-orange { background-color: #f97316; }
-.belt-dot-green { background-color: #22c55e; }
 .belt-dot-blue { background-color: #3b82f6; }
-.belt-dot-brown { background-color: #b45309; }
-.belt-dot-red { background-color: #ef4444; }
-.belt-dot-black { background-color: #38bdf8; }
+.belt-dot-purple { background-color: #a855f7; }
+.belt-dot-brown { background-color: #d97706; }
+.belt-dot-black { background-color: #ef4444; box-shadow: 0 0 4px rgba(239, 68, 68, 0.7); }
+.belt-dot-coral {
+    background: linear-gradient(90deg, #ef4444 50%, #090d14 50%);
+    border: 1px solid #f87171;
+}
 
 .kata-sandbox-extras {
     display: flex;
@@ -944,7 +1106,7 @@ kbd {
     box-shadow: 0 0 12px var(--accent-green-glow);
 }
 
-/* Kata 5: Black Belt Sandbox & Master Cheat Sheet */
+/* Kata 6: Coral Belt Theme Gallery & Master Cheat Sheet */
 .sandbox-action-box {
     background-color: var(--bg-card);
     border: 1px solid var(--border-strong);
@@ -954,6 +1116,94 @@ kbd {
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+
+.theme-gallery-card {
+    border-left: 3px solid #f87171;
+}
+
+.theme-gallery-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.theme-gallery-title {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.theme-gallery-sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.45;
+}
+
+.theme-preset-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.theme-preset-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 10px 12px;
+    border-radius: 7px;
+    background-color: var(--bg-card-elevated);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.16s ease;
+}
+
+.theme-preset-btn:hover:not(:disabled) {
+    border-color: var(--accent-cyan);
+    background-color: rgba(56, 189, 248, 0.1);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.18);
+}
+
+.theme-preset-btn.active-theme {
+    border-color: var(--accent-green);
+    background-color: rgba(34, 197, 94, 0.12);
+}
+
+.theme-btn-top {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.theme-btn-name {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.theme-swatches {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.theme-swatches .swatch {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.theme-btn-desc {
+    font-size: 11.5px;
+    color: var(--text-secondary);
 }
 
 .sandbox-action-desc {

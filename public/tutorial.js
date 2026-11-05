@@ -1,6 +1,6 @@
 // @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPL-3.0-or-later
 /**
- * tmux-dojo — Phase 3 Interactive Tutorial Runner
+ * tmux-dojo — BJJ Belt & Stripe Interactive Tutorial Runner
  * Copyright (C) 2026 Dragoş Iorgulescu
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -18,7 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const STORAGE_KEY = "tmux_dojo_progress_v1";
+const STORAGE_KEY = "tmux_dojo_bjj_progress_v2";
 
 class TutorialEngine {
     /**
@@ -130,6 +130,52 @@ class TutorialEngine {
         return { total, done, percent: total > 0 ? Math.round((done / total) * 100) : 100 };
     }
 
+    /**
+     * Builds the visual BJJ Belt & Stripes (trese) HTML for a Kata.
+     * As the user completes tasks in a belt, white stripes fill into the black/red rank bar!
+     */
+    _buildBjjBeltHtml(kata, compact = false) {
+        const beltColor = kata.beltColor || "white";
+        const tasks = Array.isArray(kata.tasks) ? kata.tasks : [];
+        const totalStripes = tasks.length > 0 ? tasks.length : 4;
+        const earnedStripes =
+            tasks.length > 0
+                ? tasks.filter((t) => this.completedTasks.has(t.id)).length
+                : 4;
+
+        let stripesHtml = "";
+        for (let i = 0; i < totalStripes; i++) {
+            const isEarned = i < earnedStripes;
+            stripesHtml += `<span class="bjj-stripe ${isEarned ? "earned" : ""}" title="Stripe ${i + 1} of ${totalStripes}"></span>`;
+        }
+
+        if (compact) {
+            return `
+                <span class="bjj-belt-label">${kata.belt}</span>
+                <span class="bjj-ponta ponta-${beltColor}" aria-label="${earnedStripes} of ${totalStripes} stripes earned">
+                    ${stripesHtml}
+                </span>
+            `;
+        }
+
+        return `
+            <div class="bjj-belt-banner belt-fabric-${beltColor}">
+                <div class="bjj-belt-stitch"></div>
+                <div class="bjj-belt-info">
+                    <span class="bjj-belt-rank-title">${kata.number} • ${kata.belt.toUpperCase()}</span>
+                    <span class="bjj-belt-stripes-text">${
+                        kata.isSandbox
+                            ? "Master Rank • 4/4 Stripes"
+                            : `${earnedStripes} / ${totalStripes} Stripes (Trese) Earned`
+                    }</span>
+                </div>
+                <div class="bjj-ponta-bar ponta-${beltColor}" title="${earnedStripes} of ${totalStripes} Stripes Earned">
+                    ${stripesHtml}
+                </div>
+            </div>
+        `;
+    }
+
     selectKata(index) {
         if (index < 0 || index >= this.katas.length) {
             return;
@@ -193,7 +239,7 @@ class TutorialEngine {
         this.render(task.id);
 
         // Execute any bonus side-effect command on ttyS1 when a task passes
-        // (e.g., teammate sending a live greeting message into /tmp/pair.sock in Kata 7 Task 4)
+        // (e.g., teammate sending a live greeting message into /tmp/pair.sock in Kata 5)
         if (task.onPassCmd && this.app && this.app.isVmReady && this.app.inspector) {
             this.app.inspector.exec(task.onPassCmd, 5000).catch(() => {});
         }
@@ -250,47 +296,65 @@ class TutorialEngine {
     }
 
     /**
-     * Injects Sensei's Recommended ~/.tmux.conf via ttyS1 and reloads tmux.
+     * Applies one of the 3 preset themes ("catppuccin", "matrix", "zen") to `/root/.tmux.conf` via ttyS1
+     * and reloads tmux immediately.
      */
-    async injectSenseiConfig() {
+    async applyThemePreset(themeKey) {
         if (!this.app || !this.app.isVmReady || !this.app.inspector) {
             return;
         }
 
-        const btn = document.getElementById("inject-sensei-conf-btn");
-        const feedback = document.getElementById("inject-sensei-feedback");
-
-        if (btn) {
-            btn.disabled = true;
-            btn.textContent = "⏳ Forging ~/.tmux.conf...";
+        const themes = window.TMUX_DOJO_THEMES || {};
+        const selected = themes[themeKey];
+        if (!selected) {
+            return;
         }
 
+        const feedback = document.getElementById("inject-sensei-feedback");
+        const allButtons = document.querySelectorAll(".theme-preset-btn");
+        allButtons.forEach((b) => {
+            b.disabled = true;
+        });
+
         try {
-            const confText = window.SENSEI_RECOMMENDED_TMUX_CONF || "";
-            const out = await this.app.inspector.writeAndReloadTmuxConf(confText);
-            if (out.includes("CONF_SAVED_OK")) {
-                if (feedback) {
-                    feedback.textContent =
-                        "✓ Injected /root/.tmux.conf and reloaded tmux! Try clicking panes or splitting with Ctrl+b | and Ctrl+b -";
-                    feedback.classList.add("visible");
-                }
-                if (btn) {
-                    btn.textContent = "✓ Sensei's ~/.tmux.conf Active (Click to Re-apply)";
-                }
+            const out = await this.app.inspector.writeAndReloadTmuxConf(selected.conf);
+            // Ensure a tmux session is running so the user sees the new status bar right away
+            await this.app.inspector.exec("tmux has-session 2>/dev/null || tmux new-session -d -s dojo", 4000);
+            await this.app.inspector.exec("tmux source-file /root/.tmux.conf 2>/dev/null || true", 4000);
+
+            if (this.app.confTextarea) {
+                this.app.confTextarea.value = selected.conf;
+                this.app._renderConfigExplanations(selected.conf);
             }
+
+            if (out.includes("CONF_SAVED_OK") && feedback) {
+                feedback.textContent = `✓ Applied "${selected.name}" to /root/.tmux.conf and hot-reloaded tmux! Open the [ ~/.tmux.conf Editor ] tab or attach to tmux to admire your new Gi.`;
+                feedback.classList.add("visible");
+            }
+
+            allButtons.forEach((b) => {
+                b.classList.toggle("active-theme", b.getAttribute("data-theme-key") === themeKey);
+            });
         } catch (err) {
             if (feedback) {
-                feedback.textContent = `⚠ Could not inject config: ${err.message}`;
+                feedback.textContent = `⚠ Could not apply theme: ${err.message}`;
                 feedback.classList.add("visible");
             }
         } finally {
-            if (btn) {
-                btn.disabled = false;
-            }
+            allButtons.forEach((b) => {
+                b.disabled = false;
+            });
             if (this.app.term) {
                 this.app.term.focus();
             }
         }
+    }
+
+    /**
+     * Injects Sensei's Recommended ~/.tmux.conf via ttyS1 and reloads tmux.
+     */
+    async injectSenseiConfig() {
+        return this.applyThemePreset("catppuccin");
     }
 
     render(justCompletedTaskId = null) {
@@ -299,9 +363,9 @@ class TutorialEngine {
             return;
         }
 
-        // Update Belt Badge in sidebar header
+        // Update Belt Badge with live BJJ rank bar & white stripes in sidebar header
         if (this.beltBadge) {
-            this.beltBadge.textContent = kata.belt;
+            this.beltBadge.innerHTML = this._buildBjjBeltHtml(kata, true);
             this.beltBadge.className = `belt-badge belt-${kata.beltColor || "white"}`;
         }
 
@@ -341,17 +405,16 @@ class TutorialEngine {
                 .map((task, idx) => {
                     const isCompleted = this.completedTasks.has(task.id);
                     const isActive = activeTask && activeTask.id === task.id;
-                    const isLocked = !isCompleted && !isActive;
                     const justFinished = justCompletedTaskId === task.id;
 
                     let stateClass = "task-locked";
-                    let badgeText = `Step ${idx + 1}`;
+                    let badgeText = `Stripe ${idx + 1}`;
                     if (isCompleted) {
                         stateClass = "task-completed";
-                        badgeText = "✓ Completed";
+                        badgeText = `✓ Stripe ${idx + 1} Earned`;
                     } else if (isActive) {
                         stateClass = "task-active";
-                        badgeText = `Active Step ${idx + 1} of ${kata.tasks.length}`;
+                        badgeText = `Active Stripe ${idx + 1} of ${kata.tasks.length}`;
                     }
 
                     return `
@@ -390,11 +453,11 @@ class TutorialEngine {
                 ? `
                     <div class="kata-complete-banner">
                         <div class="complete-banner-text">
-                            <strong>🥋 ${kata.belt} Earned!</strong> All tasks in ${kata.number} are complete.
+                            <strong>🥋 ${kata.belt} Promoted!</strong> You earned all stripes in ${kata.number}.
                         </div>
                         ${
                             nextKata
-                                ? `<button type="button" id="next-kata-btn" class="next-kata-btn">Continue to ${nextKata.number}: ${nextKata.belt} →</button>`
+                                ? `<button type="button" id="next-kata-btn" class="next-kata-btn">Promote to ${nextKata.number}: ${nextKata.belt} →</button>`
                                 : ""
                         }
                     </div>
@@ -404,8 +467,8 @@ class TutorialEngine {
             tasksSectionHtml = `
                 <div class="kata-tasks-section">
                     <div class="tasks-section-header">
-                        <span>Dojo Challenges</span>
-                        <span class="tasks-counter">${kata.tasks.filter((t) => this.completedTasks.has(t.id)).length} / ${kata.tasks.length} Complete</span>
+                        <span>Belt Promotion Challenges</span>
+                        <span class="tasks-counter">${kata.tasks.filter((t) => this.completedTasks.has(t.id)).length} / ${kata.tasks.length} Stripes</span>
                     </div>
                     <div class="kata-tasks-list">
                         ${taskItemsHtml}
@@ -424,13 +487,15 @@ class TutorialEngine {
                 <div class="kata-tabs-group">
                     ${navTabsHtml}
                 </div>
-                <span class="overall-progress-label">${progress.done}/${progress.total} Tasks</span>
+                <span class="overall-progress-label">${progress.done}/${progress.total} Stripes</span>
             </nav>
+
+            ${this._buildBjjBeltHtml(kata, false)}
 
             <div class="kata-meta">
                 <span class="kata-number">${kata.number} • ${kata.belt.toUpperCase()}</span>
                 <span class="kata-status-pill ${kataDone ? "pill-complete" : ""}">
-                    ${kata.isSandbox ? "Sandbox Mode" : kataDone ? "Completed ✓" : "In Progress"}
+                    ${kata.isSandbox ? "Open Mat Mode" : kataDone ? "Belt Completed ✓" : "In Training"}
                 </span>
             </div>
 
@@ -445,9 +510,9 @@ class TutorialEngine {
             ${kata.sandboxFooterHtml ? `<div class="kata-sandbox-extras">${kata.sandboxFooterHtml}</div>` : ""}
 
             <div class="kata-pagination-bar">
-                <button type="button" id="prev-kata-btn" class="kata-page-btn" ${prevDisabled}>← Prev Kata</button>
+                <button type="button" id="prev-kata-btn" class="kata-page-btn" ${prevDisabled}>← Prev Belt</button>
                 <button type="button" id="reset-progress-btn" class="reset-progress-link" title="Clear saved lesson progress">Reset Progress</button>
-                <button type="button" id="next-kata-nav-btn" class="kata-page-btn" ${nextDisabled}>Next Kata →</button>
+                <button type="button" id="next-kata-nav-btn" class="kata-page-btn" ${nextDisabled}>Next Belt →</button>
             </div>
         `;
 
@@ -511,7 +576,17 @@ class TutorialEngine {
             });
         }
 
-        // Kata 5: Inject Sensei's Recommended ~/.tmux.conf button
+        // Kata 6 (Coral Belt): Theme Gallery preset buttons
+        this.kataContent.querySelectorAll(".theme-preset-btn").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const themeKey = btn.getAttribute("data-theme-key");
+                if (themeKey) {
+                    this.applyThemePreset(themeKey);
+                }
+            });
+        });
+
+        // Legacy/fallback button support
         const injectBtn = document.getElementById("inject-sensei-conf-btn");
         if (injectBtn) {
             injectBtn.addEventListener("click", () => {
