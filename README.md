@@ -89,8 +89,9 @@ This repository includes a ready-to-use GitHub Actions workflow ([`.github/workf
 
 ## Contributors
 
-- **Dragoş Iorgulescu** — Creator & Architect
-- **Antigravity (Google DeepMind)** — Agentic AI Pair-Programming Contributor
+- **Dragoş Iorgulescu** ([@diorgulescu](https://github.com/diorgulescu)) — Creator & Architect
+- **Antigravity (Google DeepMind)** ([@google-gemini](https://github.com/google-gemini)) — Agentic AI Pair-Programming Contributor
+- **Mistral Vibe** ([@mistralai](https://github.com/mistralai)) — Hardening operations, spellchecking, and compliance tests
 
 ---
 
