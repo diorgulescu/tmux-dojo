@@ -38,9 +38,9 @@ tmux-dojo/
 │   └── generate_snapshot.js   # Boots the VM in Node.js and saves initial_state.bin
 └── public/
     ├── index.html             # Split-screen Dojo UI (35% Kata sidebar / 65% Workspace)
-    ├── style.css              # High-contrast dark terminal styling
+    ├── style.css              # High-contrast dark terminal & BJJ Belt/Stripe styling
     ├── app.js                 # V86Starter, xterm.js, VmInspector (ttyS1), & Config Editor
-    ├── lessons.js             # 5-Belt English Kata curriculum & checkCmd definitions
+    ├── lessons.js             # 7-Belt BJJ curriculum (37 tasks), Grandmaster Vault & Cheat Sheet
     ├── tutorial.js            # Interactive TutorialEngine polling ttyS1 every 1500ms
     ├── vendor/                # Vendored xterm.js & xterm-addon-fit assets
     └── v86/                   # libv86.js, v86.wasm, BIOS ROMs, bzImage, initramfs, initial_state.bin
@@ -84,6 +84,13 @@ This repository includes a ready-to-use GitHub Actions workflow ([`.github/workf
 2. On GitHub, go to **Settings → Pages**.
 3. Under **Build and deployment → Source**, select **GitHub Actions**.
 4. The `Deploy tmux-dojo to GitHub Pages` workflow will run automatically on every push to `main` and publish the live interactive tutorial at `https://<your-username>.github.io/tmux-dojo/`.
+
+---
+
+## Contributors
+
+- **Dragoş Iorgulescu** — Creator & Architect
+- **Antigravity (Google DeepMind)** — Agentic AI Pair-Programming Contributor
 
 ---
 
