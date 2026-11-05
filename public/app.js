@@ -47,6 +47,10 @@ const PREFIX_COMBO_DESCRIPTIONS = {
     "|": "Split Vertically (Custom Bind)",
     "-": "Split Horizontally (Custom Bind)",
     r: "Reload ~/.tmux.conf (Custom Bind)",
+    g: "Open Floating Popup Terminal (Coral Belt Bind)",
+    K: "Respawn Active Pane In-Place (Coral Belt Bind)",
+    S: "Toggle Synchronize-Panes (War Room Bind)",
+    P: "Capture Pane Scrollback to /tmp/audit.log",
     ArrowUp: "Focus Pane Up",
     ArrowDown: "Focus Pane Down",
     ArrowLeft: "Focus Pane Left",
@@ -136,6 +140,25 @@ function analyzeTmuxConfLines(rawText) {
         } else if (/bind(?:-key)?\s+-\s+split-window\s+-v/i.test(trimmed)) {
             category = "Keybinding";
             summary = "Binds Prefix + - to split the current pane horizontally (top/bottom, preserving current path).";
+        } else if (/bind(?:-key)?\s+g\s+display-popup/i.test(trimmed)) {
+            category = "Popup (Master)";
+            summary = "Binds Prefix + g to open a centered floating overlay terminal (display-popup).";
+        } else if (/bind(?:-key)?\s+K\s+respawn-pane\s+-k/i.test(trimmed)) {
+            category = "Pane Surgery";
+            summary = "Binds Prefix + K to kill a hung process and respawn a fresh shell inside the active pane in-place.";
+        } else if (/bind(?:-key)?\s+S\s+setw\s+synchronize-panes/i.test(trimmed)) {
+            category = "War Room Ops";
+            summary = "Binds Prefix + S to toggle synchronize-panes broadcast mode across all panes in the current window.";
+        } else if (/bind(?:-key)?\s+P\s+capture-pane/i.test(trimmed)) {
+            category = "Screen Scraping";
+            summary = "Binds Prefix + P to headlessly capture the active pane's scrollback buffer and save it to /tmp/audit.log.";
+        } else if (/set-hook\s+-g\s+(\S+)\s+(.+)/i.test(trimmed)) {
+            const m = trimmed.match(/set-hook\s+-g\s+(\S+)\s+(.+)/i);
+            category = "Event Hook";
+            summary = `Registers an automated lifecycle hook on '${m ? m[1] : "event"}' to run: ${m ? m[2] : "command"}`;
+        } else if (/message-style/i.test(trimmed)) {
+            category = "Status Bar";
+            summary = "Styles the Ctrl+b : command prompt bar and transient status notifications.";
         } else if (/bind(?:-key)?\s+r\s+source-file/i.test(trimmed)) {
             category = "Keybinding";
             summary = "Binds Prefix + r to hot-reload ~/.tmux.conf inside the running tmux server.";

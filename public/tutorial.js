@@ -1,6 +1,6 @@
 // @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPL-3.0-or-later
 /**
- * tmux-dojo — BJJ Belt & Stripe Interactive Tutorial Runner
+ * tmux-dojo — 7-Belt BJJ & Grandmaster Interactive Tutorial Runner
  * Copyright (C) 2026 Dragoş Iorgulescu
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -18,7 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const STORAGE_KEY = "tmux_dojo_bjj_progress_v2";
+const STORAGE_KEY = "tmux_dojo_bjj_progress_v3";
 
 class TutorialEngine {
     /**
@@ -34,6 +34,10 @@ class TutorialEngine {
         this.hintVisible = false;
         this.pollTimer = null;
         this.isPollingCheck = false;
+
+        // Interactive Master Cheat Sheet filter state
+        this.cheatSheetCategory = "All";
+        this.cheatSheetQuery = "";
 
         // DOM references
         this.beltBadge = document.getElementById("belt-badge");
@@ -132,7 +136,7 @@ class TutorialEngine {
 
     /**
      * Builds the visual BJJ Belt & Stripes (trese) HTML for a Kata.
-     * As the user completes tasks in a belt, white stripes fill into the black/red rank bar!
+     * As the user completes tasks in a belt, white/gold stripes fill into the rank bar!
      */
     _buildBjjBeltHtml(kata, compact = false) {
         const beltColor = kata.beltColor || "white";
@@ -158,16 +162,19 @@ class TutorialEngine {
             `;
         }
 
+        const rankSub =
+            beltColor === "red"
+                ? `9th/10th Degree Grandmaster • ${earnedStripes} / ${totalStripes} Grandmaster Stripes`
+                : beltColor === "coral"
+                ? `7th Degree Master • ${earnedStripes} / ${totalStripes} Master Stripes`
+                : `${earnedStripes} / ${totalStripes} Stripes (Trese) Earned`;
+
         return `
             <div class="bjj-belt-banner belt-fabric-${beltColor}">
                 <div class="bjj-belt-stitch"></div>
                 <div class="bjj-belt-info">
                     <span class="bjj-belt-rank-title">${kata.number} • ${kata.belt.toUpperCase()}</span>
-                    <span class="bjj-belt-stripes-text">${
-                        kata.isSandbox
-                            ? "Master Rank • 4/4 Stripes"
-                            : `${earnedStripes} / ${totalStripes} Stripes (Trese) Earned`
-                    }</span>
+                    <span class="bjj-belt-stripes-text">${rankSub}</span>
                 </div>
                 <div class="bjj-ponta-bar ponta-${beltColor}" title="${earnedStripes} of ${totalStripes} Stripes Earned">
                     ${stripesHtml}
@@ -239,7 +246,6 @@ class TutorialEngine {
         this.render(task.id);
 
         // Execute any bonus side-effect command on ttyS1 when a task passes
-        // (e.g., teammate sending a live greeting message into /tmp/pair.sock in Kata 5)
         if (task.onPassCmd && this.app && this.app.isVmReady && this.app.inspector) {
             this.app.inspector.exec(task.onPassCmd, 5000).catch(() => {});
         }
@@ -296,8 +302,8 @@ class TutorialEngine {
     }
 
     /**
-     * Applies one of the 3 preset themes ("catppuccin", "matrix", "zen") to `/root/.tmux.conf` via ttyS1
-     * and reloads tmux immediately.
+     * Applies one of the Grandmaster's Vault themes ("gracie", "catppuccin", "warroom")
+     * to `/root/.tmux.conf` via ttyS1 and reloads tmux immediately.
      */
     async applyThemePreset(themeKey) {
         if (!this.app || !this.app.isVmReady || !this.app.inspector) {
@@ -318,7 +324,6 @@ class TutorialEngine {
 
         try {
             const out = await this.app.inspector.writeAndReloadTmuxConf(selected.conf);
-            // Ensure a tmux session is running so the user sees the new status bar right away
             await this.app.inspector.exec("tmux has-session 2>/dev/null || tmux new-session -d -s dojo", 4000);
             await this.app.inspector.exec("tmux source-file /root/.tmux.conf 2>/dev/null || true", 4000);
 
@@ -327,12 +332,16 @@ class TutorialEngine {
                 this.app._renderConfigExplanations(selected.conf);
             }
 
-            if (out.includes("CONF_SAVED_OK") && feedback) {
-                feedback.textContent = `✓ Applied "${selected.name}" to /root/.tmux.conf and hot-reloaded tmux! Open the [ ~/.tmux.conf Editor ] tab or attach to tmux to admire your new Gi.`;
-                feedback.classList.add("visible");
+            // Immediately verify if this satisfies the active task (e.g., k7-t2-grandmaster-conf)
+            await this.checkActiveTask();
+
+            const updatedFeedback = document.getElementById("inject-sensei-feedback");
+            if (out.includes("CONF_SAVED_OK") && updatedFeedback) {
+                updatedFeedback.textContent = `✓ Forged "${selected.name}" into /root/.tmux.conf and hot-reloaded tmux!`;
+                updatedFeedback.classList.add("visible");
             }
 
-            allButtons.forEach((b) => {
+            document.querySelectorAll(".theme-preset-btn").forEach((b) => {
                 b.classList.toggle("active-theme", b.getAttribute("data-theme-key") === themeKey);
             });
         } catch (err) {
@@ -341,7 +350,7 @@ class TutorialEngine {
                 feedback.classList.add("visible");
             }
         } finally {
-            allButtons.forEach((b) => {
+            document.querySelectorAll(".theme-preset-btn").forEach((b) => {
                 b.disabled = false;
             });
             if (this.app.term) {
@@ -355,6 +364,55 @@ class TutorialEngine {
      */
     async injectSenseiConfig() {
         return this.applyThemePreset("catppuccin");
+    }
+
+    _renderCheatSheetRows() {
+        const tbody = document.getElementById("cheatsheet-table-body");
+        if (!tbody) {
+            return;
+        }
+        const items = window.MASTER_CHEATSHEET_ITEMS || [];
+        const q = (this.cheatSheetQuery || "").trim().toLowerCase();
+        const cat = this.cheatSheetCategory || "All";
+
+        const filtered = items.filter((item) => {
+            const matchesCat = cat === "All" || item.category === cat;
+            if (!matchesCat) {
+                return false;
+            }
+            if (!q) {
+                return true;
+            }
+            return (
+                item.category.toLowerCase().includes(q) ||
+                item.cmd.toLowerCase().includes(q) ||
+                item.desc.toLowerCase().includes(q)
+            );
+        });
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="3" class="cheatsheet-empty-cell">No matching tmux commands or variables found.</td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = filtered
+            .map(
+                (item) => `
+                <tr>
+                    <td><span class="cheatsheet-cat-tag">${item.category}</span></td>
+                    <td><code>${item.cmd
+                        .replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")}</code></td>
+                    <td>${item.desc}</td>
+                </tr>
+            `
+            )
+            .join("");
     }
 
     render(justCompletedTaskId = null) {
@@ -400,7 +458,7 @@ class TutorialEngine {
 
         // Build Task Checklist
         let tasksSectionHtml = "";
-        if (!kata.isSandbox && kata.tasks && kata.tasks.length > 0) {
+        if (kata.tasks && kata.tasks.length > 0) {
             const taskItemsHtml = kata.tasks
                 .map((task, idx) => {
                     const isCompleted = this.completedTasks.has(task.id);
@@ -449,20 +507,37 @@ class TutorialEngine {
                 .join("");
 
             const nextKata = this.katas[this.currentKataIndex + 1];
-            const completionBannerHtml = kataDone
-                ? `
-                    <div class="kata-complete-banner">
-                        <div class="complete-banner-text">
-                            <strong>🥋 ${kata.belt} Promoted!</strong> You earned all stripes in ${kata.number}.
+            const isGrandmasterKata = kata.beltColor === "red";
+
+            let completionBannerHtml = "";
+            if (kataDone) {
+                if (isGrandmasterKata) {
+                    completionBannerHtml = `
+                        <div class="certificate-of-mastery-banner" id="certificate-of-mastery-banner">
+                            <div class="certificate-crest">🟥</div>
+                            <div class="certificate-body">
+                                <div class="certificate-headline">🟥 RED BELT GRANDMASTER — TMUX DOJO COMPLETED</div>
+                                <div class="certificate-sub">
+                                    All 7 BJJ Belts mastered • Total Tasks Completed: <strong>${progress.done}/${progress.total}</strong> (${progress.total}/${progress.total})
+                                </div>
+                            </div>
                         </div>
-                        ${
-                            nextKata
-                                ? `<button type="button" id="next-kata-btn" class="next-kata-btn">Promote to ${nextKata.number}: ${nextKata.belt} →</button>`
-                                : ""
-                        }
-                    </div>
-                `
-                : "";
+                    `;
+                } else {
+                    completionBannerHtml = `
+                        <div class="kata-complete-banner">
+                            <div class="complete-banner-text">
+                                <strong>🥋 ${kata.belt} Promoted!</strong> You earned all stripes in ${kata.number}.
+                            </div>
+                            ${
+                                nextKata
+                                    ? `<button type="button" id="next-kata-btn" class="next-kata-btn">Promote to ${nextKata.number}: ${nextKata.belt} →</button>`
+                                    : ""
+                            }
+                        </div>
+                    `;
+                }
+            }
 
             tasksSectionHtml = `
                 <div class="kata-tasks-section">
@@ -487,7 +562,7 @@ class TutorialEngine {
                 <div class="kata-tabs-group">
                     ${navTabsHtml}
                 </div>
-                <span class="overall-progress-label">${progress.done}/${progress.total} Stripes</span>
+                <span class="overall-progress-label">${progress.done}/${progress.total} Tasks</span>
             </nav>
 
             ${this._buildBjjBeltHtml(kata, false)}
@@ -495,7 +570,7 @@ class TutorialEngine {
             <div class="kata-meta">
                 <span class="kata-number">${kata.number} • ${kata.belt.toUpperCase()}</span>
                 <span class="kata-status-pill ${kataDone ? "pill-complete" : ""}">
-                    ${kata.isSandbox ? "Open Mat Mode" : kataDone ? "Belt Completed ✓" : "In Training"}
+                    ${kataDone ? "Belt Completed ✓" : "In Training"}
                 </span>
             </div>
 
@@ -516,6 +591,7 @@ class TutorialEngine {
             </div>
         `;
 
+        this._renderCheatSheetRows();
         this._bindRenderedEvents();
     }
 
@@ -576,13 +652,35 @@ class TutorialEngine {
             });
         }
 
-        // Kata 6 (Coral Belt): Theme Gallery preset buttons
+        // Kata 7 (Red Belt): Grandmaster's Vault preset buttons
         this.kataContent.querySelectorAll(".theme-preset-btn").forEach((btn) => {
             btn.addEventListener("click", () => {
                 const themeKey = btn.getAttribute("data-theme-key");
                 if (themeKey) {
                     this.applyThemePreset(themeKey);
                 }
+            });
+        });
+
+        // Interactive Master Cheat Sheet search & category filter pills
+        const searchInput = document.getElementById("cheatsheet-search-input");
+        if (searchInput) {
+            searchInput.value = this.cheatSheetQuery;
+            searchInput.addEventListener("input", (e) => {
+                this.cheatSheetQuery = e.target.value;
+                this._renderCheatSheetRows();
+            });
+        }
+
+        this.kataContent.querySelectorAll(".cheatsheet-pill").forEach((pill) => {
+            const cat = pill.getAttribute("data-category");
+            pill.classList.toggle("active", cat === this.cheatSheetCategory);
+            pill.addEventListener("click", () => {
+                this.cheatSheetCategory = cat || "All";
+                this.kataContent.querySelectorAll(".cheatsheet-pill").forEach((p) => {
+                    p.classList.toggle("active", p.getAttribute("data-category") === this.cheatSheetCategory);
+                });
+                this._renderCheatSheetRows();
             });
         });
 

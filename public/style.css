@@ -182,17 +182,24 @@ body {
 .belt-badge.belt-coral {
     background: repeating-linear-gradient(
         90deg,
-        rgba(220, 38, 38, 0.38) 0px,
-        rgba(220, 38, 38, 0.38) 12px,
-        rgba(10, 14, 23, 0.92) 12px,
-        rgba(10, 14, 23, 0.92) 24px
+        rgba(220, 38, 38, 0.45) 0px,
+        rgba(220, 38, 38, 0.45) 12px,
+        rgba(10, 14, 23, 0.94) 12px,
+        rgba(10, 14, 23, 0.94) 24px
     );
     border-color: #f87171;
     color: #ffffff;
     box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
 }
 
-/* Compact BJJ Rank Bar (Ponta Preta / Red Bar) inside top badge */
+.belt-badge.belt-red {
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    border: 1px solid #fbbf24;
+    color: #fef08a;
+    box-shadow: 0 0 14px rgba(220, 38, 38, 0.55), inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+
+/* Compact BJJ Rank Bar (Ponta Preta / Red Bar / Grandmaster Trim) inside top badge */
 .bjj-ponta {
     display: inline-flex;
     align-items: center;
@@ -206,12 +213,17 @@ body {
 
 .bjj-ponta.ponta-black {
     background-color: #b91c1c;
-    border-color: #f87171;
+    border-color: #ffffff;
 }
 
 .bjj-ponta.ponta-coral {
     background-color: #06080d;
-    border-color: #fbbf24;
+    border-color: #ffffff;
+}
+
+.bjj-ponta.ponta-red {
+    background-color: #7f1d1d;
+    border: 1px solid #fbbf24;
 }
 
 /* Full-width Visual BJJ Belt Banner in Kata Header */
@@ -264,21 +276,33 @@ body {
 }
 
 .belt-fabric-black {
-    background: linear-gradient(180deg, #111827 0%, #030712 100%);
-    border-color: #ef4444;
+    background: linear-gradient(180deg, #0b0f17 0%, #030509 100%);
+    border-color: #b91c1c;
     color: #f8fafc;
 }
 
 .belt-fabric-coral {
     background: repeating-linear-gradient(
         90deg,
-        #b91c1c 0px,
-        #b91c1c 26px,
-        #090d14 26px,
-        #090d14 52px
+        #dc2626 0px,
+        #dc2626 26px,
+        #070a10 26px,
+        #070a10 52px
     );
     border-color: #f87171;
     color: #ffffff;
+}
+
+.belt-fabric-red {
+    background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
+    border: 2px solid #fbbf24;
+    color: #ffffff;
+    box-shadow: 0 0 18px rgba(220, 38, 38, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.belt-fabric-red .bjj-belt-stitch {
+    border-top: 1px dashed rgba(251, 191, 36, 0.7);
+    border-bottom: 1px dashed rgba(251, 191, 36, 0.7);
 }
 
 .bjj-belt-info {
@@ -292,9 +316,14 @@ body {
 }
 
 .belt-fabric-coral .bjj-belt-info {
-    background: rgba(9, 13, 20, 0.78);
+    background: rgba(7, 10, 16, 0.82);
     backdrop-filter: blur(2px);
-    border-right: 1px solid rgba(248, 113, 113, 0.35);
+    border-right: 1px solid rgba(248, 113, 113, 0.45);
+}
+
+.belt-fabric-red .bjj-belt-rank-title {
+    color: #fef08a;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
 }
 
 .bjj-belt-rank-title {
@@ -325,14 +354,21 @@ body {
 }
 
 .bjj-ponta-bar.ponta-black {
-    background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
+    background: linear-gradient(180deg, #b91c1c 0%, #7f1d1d 100%);
     border-left: 3px solid #ffffff;
     border-right: 3px solid #ffffff;
 }
 
 .bjj-ponta-bar.ponta-coral {
     background-color: #05070b;
-    border-left: 2px solid #fbbf24;
+    border-left: 3px solid #ffffff;
+    border-right: 3px solid #ffffff;
+}
+
+.bjj-ponta-bar.ponta-red {
+    background: linear-gradient(180deg, #7f1d1d 0%, #450a0a 100%);
+    border-left: 3px solid #fbbf24;
+    border-right: 3px solid #ffffff;
 }
 
 .bjj-stripe {
@@ -802,10 +838,15 @@ kbd {
 .belt-dot-blue { background-color: #3b82f6; }
 .belt-dot-purple { background-color: #a855f7; }
 .belt-dot-brown { background-color: #d97706; }
-.belt-dot-black { background-color: #ef4444; box-shadow: 0 0 4px rgba(239, 68, 68, 0.7); }
+.belt-dot-black { background-color: #0b0f17; border: 1.5px solid #ef4444; }
 .belt-dot-coral {
-    background: linear-gradient(90deg, #ef4444 50%, #090d14 50%);
+    background: linear-gradient(90deg, #dc2626 50%, #090d14 50%);
     border: 1px solid #f87171;
+}
+.belt-dot-red {
+    background-color: #dc2626;
+    border: 1.5px solid #fbbf24;
+    box-shadow: 0 0 6px rgba(220, 38, 38, 0.85);
 }
 
 .kata-sandbox-extras {
@@ -1248,6 +1289,173 @@ kbd {
     display: flex;
     flex-direction: column;
     gap: 12px;
+}
+
+/* Certificate of Mastery Banner (Red Belt Grandmaster) */
+.certificate-of-mastery-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.28) 0%, rgba(127, 29, 29, 0.42) 100%);
+    border: 1.5px solid #fbbf24;
+    box-shadow: 0 0 18px rgba(220, 38, 38, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+.certificate-crest {
+    font-size: 22px;
+    line-height: 1;
+    filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.6));
+}
+
+.certificate-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.certificate-headline {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    color: #fef08a;
+}
+
+.certificate-sub {
+    font-size: 12px;
+    color: var(--text-primary);
+}
+
+/* Interactive Searchable & Filterable Master Cheat Sheet */
+.interactive-cheatsheet-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-left: 3px solid #fbbf24;
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cheatsheet-card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cheatsheet-search-input {
+    width: 100%;
+    padding: 7px 11px;
+    border-radius: 6px;
+    background-color: var(--bg-topbar);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    outline: none;
+}
+
+.cheatsheet-search-input:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.16);
+}
+
+.cheatsheet-filter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.cheatsheet-pill {
+    padding: 3px 8px;
+    border-radius: 999px;
+    background-color: var(--bg-card-elevated);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.cheatsheet-pill:hover {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+}
+
+.cheatsheet-pill.active {
+    background-color: rgba(251, 191, 36, 0.18);
+    border-color: #fbbf24;
+    color: #fef08a;
+}
+
+.cheatsheet-table-wrapper {
+    max-height: 290px;
+    overflow-y: auto;
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    background-color: var(--bg-topbar);
+}
+
+.cheatsheet-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.cheatsheet-table th {
+    position: sticky;
+    top: 0;
+    background-color: var(--bg-card-elevated);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: left;
+    padding: 7px 9px;
+    border-bottom: 1px solid var(--border-strong);
+}
+
+.cheatsheet-table td {
+    padding: 6px 9px;
+    border-bottom: 1px solid rgba(31, 43, 62, 0.65);
+    vertical-align: top;
+    color: var(--text-secondary);
+}
+
+.cheatsheet-table td code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent-green);
+    background-color: var(--bg-card);
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid var(--border-subtle);
+    white-space: nowrap;
+}
+
+.cheatsheet-cat-tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background-color: rgba(56, 189, 248, 0.12);
+    color: var(--accent-cyan);
+    white-space: nowrap;
+}
+
+.cheatsheet-empty-cell {
+    text-align: center;
+    padding: 16px !important;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
 }
 
 .cheatsheet-section {

@@ -1,33 +1,81 @@
 // @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPL-3.0-or-later
 /**
- * tmux-dojo — Complete Brazilian Jiu-Jitsu (BJJ) Belt & Stripe Curriculum (English)
+ * tmux-dojo — Complete 7-Belt Brazilian Jiu-Jitsu (BJJ) Progression (English)
  * Copyright (C) 2026 Dragoş Iorgulescu
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
- * Progression:
+ * Progression (37 Total Auto-Verified Tasks):
  *   Kata 1: White Belt  — Survival & Escapes (Sessions & Client-Server) [6 Tasks]
  *   Kata 2: Blue Belt   — Guard Work & Spatial Control (Panes & Windows) [6 Tasks]
  *   Kata 3: Purple Belt — Flow State, Vi Buffers & Keybinding Modifiers (~/.tmux.conf) [6 Tasks]
- *   Kata 4: Brown Belt  — Customizing Your Gi (Status Bar Ricing, Colors, Modifiers & Live Telemetry) [5 Tasks]
+ *   Kata 4: Brown Belt  — Customizing Your Gi (Status Bar Ricing, Colors, Modifiers & Live Telemetry) [6 Tasks]
  *   Kata 5: Black Belt  — Team Ops, Shared Sockets & Automation (Multi-User & Scripting) [6 Tasks]
- *   Kata 6: Coral Belt  — Open Mat (Sandbox, Theme Gallery & Master Cheat Sheet) [3 Preset Themes]
+ *   Kata 6: Coral Belt  — Invisible Jiu-Jitsu (Popups, Event Hooks & Pane Surgery) [5 Tasks]
+ *   Kata 7: Red Belt    — The Art of Effortlessness (Idempotent Architecture & The Grandmaster's Vault) [2 Tasks]
  */
 
 const TMUX_DOJO_THEMES = {
-    catppuccin: {
-        name: "Catppuccin Mocha Dojo",
-        tagline: "Modern dark pastel palette with dynamic Red/Green Prefix indicator & live CPU load",
+    gracie: {
+        name: "Gracie Classic (Minimalist High-Contrast)",
+        tagline: "Ultra-low resource usage, zero visual clutter, Vi copy-mode, and Ctrl+a / Ctrl+b dual prefix",
         conf: `# ============================================================================
-# Theme: Catppuccin Mocha Dojo (Sensei's Recommended Default)
+# Grandmaster Vault 1: Gracie Classic (Minimalist High-Contrast)
 # ============================================================================
 
-# Core Ergonomics & Vi Copy Mode
+# Zero-Latency Escape & Core Ergonomics
+set -s escape-time 0
 set -g mouse on
 setw -g mode-keys vi
 set -g base-index 1
 setw -g pane-base-index 1
 set -g renumber-windows on
-set -g history-limit 10000
+set -g history-limit 20000
+set -g default-terminal "tmux-256color"
+
+# Dual Prefix (Ctrl+b and Ctrl+a)
+set -g prefix2 C-a
+bind C-a send-prefix -2
+
+# Clean Splits & Fast Config Reload
+bind | split-window -h -c "#{pane_current_path}"
+bind - split-window -v -c "#{pane_current_path}"
+bind K respawn-pane -k
+bind r source-file ~/.tmux.conf \\; display "Gracie Classic Reloaded!"
+
+# High-Contrast Monochrome Status Bar
+set -g status-position bottom
+set -g status-interval 5
+set -g status-style "bg=#090d14,fg=#f8fafc"
+set -g message-style "bg=#f8fafc,fg=#090d14,bold"
+set -g pane-border-style "fg=#334155"
+set -g pane-active-border-style "fg=#f8fafc,bold"
+
+setw -g window-status-style "bg=#090d14,fg=#94a3b8"
+setw -g window-status-format " #I:#W "
+setw -g window-status-current-style "bg=#f8fafc,fg=#090d14,bold"
+setw -g window-status-current-format " [#I:#W#{?window_zoomed_flag,*Z*,}] "
+
+set -g status-left-length 30
+set -g status-left "#{?client_prefix,#[bg=#ef4444 fg=#ffffff bold] PREFIX #[default],#[bg=#f8fafc fg=#090d14 bold] #S #[default]} "
+set -g status-right-length 50
+set -g status-right "#[fg=#94a3b8]#{pane_current_command} #[fg=#f8fafc bold]%H:%M "
+`
+    },
+    catppuccin: {
+        name: "Catppuccin Mocha Telemetry",
+        tagline: "Full 24-bit hex theming, conditional client_prefix badge, live /proc/loadavg & memory telemetry",
+        conf: `# ============================================================================
+# Grandmaster Vault 2: Catppuccin Mocha Telemetry
+# ============================================================================
+
+# Core Ergonomics & Vi Copy Mode
+set -s escape-time 0
+set -g mouse on
+setw -g mode-keys vi
+set -g base-index 1
+setw -g pane-base-index 1
+set -g renumber-windows on
+set -g history-limit 20000
 set -g default-terminal "tmux-256color"
 
 # Dual Prefix (Ctrl+b and Ctrl+a)
@@ -44,13 +92,16 @@ bind -n M-Right select-pane -R
 bind -r H resize-pane -L 5
 bind -r L resize-pane -R 5
 
-# Fast Config Reload
-bind r source-file ~/.tmux.conf \\; display "Catppuccin Mocha Dojo Reloaded!"
+# Coral Belt Master Binds (Popup & Respawn)
+bind g display-popup -w 80% -h 80% -E "echo 'Catppuccin Scratchpad'; sh"
+bind K respawn-pane -k
+bind r source-file ~/.tmux.conf \\; display "Catppuccin Mocha Telemetry Reloaded!"
 
 # Catppuccin Mocha Status Bar & Borders
 set -g status-position bottom
 set -g status-interval 2
 set -g status-style "bg=#1e1e2e,fg=#cdd6f4"
+set -g message-style "bg=#f9e2af,fg=#11111b,bold"
 set -g pane-border-style "fg=#45475a"
 set -g pane-active-border-style "fg=#a6e3a1,bold"
 
@@ -59,25 +110,27 @@ setw -g window-status-format " #I:#W "
 setw -g window-status-current-style "bg=#89b4fa,fg=#11111b,bold"
 setw -g window-status-current-format " #I:#W#{?window_zoomed_flag, [Z],} "
 
-set -g status-left-length 40
+set -g status-left-length 45
 set -g status-left "#{?client_prefix,#[bg=#f38ba8 fg=#11111b bold] PREFIX #[default],#[bg=#a6e3a1 fg=#11111b bold] #S #[default]} "
 
-set -g status-right-length 80
-set -g status-right "#[fg=#f9e2af]CMD:#{pane_current_command} #[fg=#89b4fa]| LOAD:#(cut -d' ' -f1 /proc/loadavg) #[fg=#cdd6f4]| %H:%M "
+set -g status-right-length 90
+set -g status-right "#[fg=#f9e2af]CMD:#{pane_current_command} #[fg=#89b4fa]| LOAD:#(cut -d' ' -f1 /proc/loadavg) #[fg=#cba6f7]| MEM:#( awk '/MemAvailable/{printf \"%dM\", $2/1024}' /proc/meminfo ) #[fg=#cdd6f4]| %H:%M "
 `
     },
-    matrix: {
-        name: "Cyberpunk Matrix",
-        tagline: "High-contrast neon phosphor green on pure black with sharp cybernetic borders",
+    warroom: {
+        name: "SysAdmin War Room Edition",
+        tagline: "Multi-user incident ops: Prefix+S sync toggle with red SYNC ON alert & Prefix+P pane capture",
         conf: `# ============================================================================
-# Theme: Cyberpunk Matrix
+# Grandmaster Vault 3: SysAdmin War Room Edition
 # ============================================================================
 
+set -s escape-time 0
 set -g mouse on
 setw -g mode-keys vi
 set -g base-index 1
 setw -g pane-base-index 1
 set -g renumber-windows on
+set -g history-limit 50000
 set -g default-terminal "tmux-256color"
 
 set -g prefix2 C-a
@@ -88,74 +141,83 @@ bind -n M-Left select-pane -L
 bind -n M-Right select-pane -R
 bind -r H resize-pane -L 5
 bind -r L resize-pane -R 5
-bind r source-file ~/.tmux.conf \\; display "Matrix Protocol Reloaded!"
 
-# High-Contrast Phosphor Green on Void Black
+# War Room Incident Response Binds:
+# Prefix + S -> Toggle synchronize-panes with visual status alert
+bind S setw synchronize-panes \\; display "synchronize-panes toggled!"
+# Prefix + P -> Dump active pane scrollback directly to /tmp/audit.log
+bind P capture-pane -p \\; save-buffer /tmp/audit.log \\; display "Captured pane to /tmp/audit.log!"
+# Prefix + g -> Floating incident popup
+bind g display-popup -w 80% -h 80% -E "uptime; free -m; sleep 2"
+# Prefix + K -> Respawn hung pane in-place
+bind K respawn-pane -k
+bind r source-file ~/.tmux.conf \\; display "SysAdmin War Room Config Reloaded!"
+
+# High-Visibility Tactical Status Bar with #{?pane_synchronized} Warning
 set -g status-position bottom
 set -g status-interval 2
-set -g status-style "bg=#000000,fg=#00ff66"
-set -g pane-border-style "fg=#003311"
-set -g pane-active-border-style "fg=#00ff66,bold"
+set -g status-style "bg=#0b1019,fg=#eef4fc"
+set -g message-style "bg=#ef4444,fg=#ffffff,bold"
+set -g pane-border-style "fg=#1f2b3e"
+set -g pane-active-border-style "fg=#ef4444,bold"
 
-setw -g window-status-style "bg=#000000,fg=#008833"
+setw -g window-status-style "bg=#0b1019,fg=#647792"
 setw -g window-status-format " [#I:#W] "
-setw -g window-status-current-style "bg=#00ff66,fg=#000000,bold"
-setw -g window-status-current-format " <#I:#W#{?window_zoomed_flag,*Z*,}> "
+setw -g window-status-current-style "bg=#ef4444,fg=#ffffff,bold"
+setw -g window-status-current-format " [#I:#W#{?window_zoomed_flag, *Z*,}] "
 
-set -g status-left-length 40
-set -g status-left "#{?client_prefix,#[bg=#ff0055 fg=#000000 bold] [OVERRIDE] #[default],#[bg=#00ff66 fg=#000000 bold] [#S] #[default]} "
+set -g status-left-length 60
+set -g status-left "#{?client_prefix,#[bg=#f59e0b fg=#000000 bold] PREFIX #[default],#[bg=#dc2626 fg=#ffffff bold] WARROOM:#S #[default]}#{?pane_synchronized,#[bg=red fg=#ffffff bold] SYNC ON #[default],} "
 
-set -g status-right-length 80
-set -g status-right "#[fg=#00ff66]SYS:#{pane_current_command} // LOAD:#(cut -d' ' -f1 /proc/loadavg) // %H:%M:%S "
-`
-    },
-    zen: {
-        name: "Minimalist Zen",
-        tagline: "Top status bar, muted slate typography, and distraction-free monochrome focus",
-        conf: `# ============================================================================
-# Theme: Minimalist Zen
-# ============================================================================
-
-set -g mouse on
-setw -g mode-keys vi
-set -g base-index 1
-setw -g pane-base-index 1
-set -g renumber-windows on
-set -g default-terminal "tmux-256color"
-
-set -g prefix2 C-a
-bind C-a send-prefix -2
-bind | split-window -h -c "#{pane_current_path}"
-bind - split-window -v -c "#{pane_current_path}"
-bind -n M-Left select-pane -L
-bind -n M-Right select-pane -R
-bind -r H resize-pane -L 5
-bind -r L resize-pane -R 5
-bind r source-file ~/.tmux.conf \\; display "Zen Config Reloaded"
-
-# Top Status Bar & Muted Monochrome Aesthetics
-set -g status-position top
-set -g status-interval 5
-set -g status-justify left
-set -g status-style "bg=#0e141f,fg=#647792"
-set -g pane-border-style "fg=#182336"
-set -g pane-active-border-style "fg=#647792"
-
-setw -g window-status-style "bg=#0e141f,fg=#647792"
-setw -g window-status-format "  #I·#W  "
-setw -g window-status-current-style "bg=#0e141f,fg=#eef4fc,bold,underscore"
-setw -g window-status-current-format "  #I·#W#{?window_zoomed_flag, (z),}  "
-
-set -g status-left-length 30
-set -g status-left "#{?client_prefix,#[fg=#f59e0b bold] ● #S ,#[fg=#9fb0c7] ○ #S } "
-
-set -g status-right-length 60
-set -g status-right "#[fg=#647792]#{pane_current_command}  %H:%M "
+set -g status-right-length 85
+set -g status-right "#{?client_readonly,#[bg=#3b82f6 fg=#ffffff bold] READ-ONLY #[default] ,}#[fg=#f59e0b]LOAD:#(cut -d' ' -f1 /proc/loadavg) #[fg=#38bdf8]| %H:%M:%S "
 `
     }
 };
 
+// Backwards-compatible aliases
+TMUX_DOJO_THEMES.matrix = TMUX_DOJO_THEMES.warroom;
+TMUX_DOJO_THEMES.zen = TMUX_DOJO_THEMES.gracie;
+
 const SENSEI_RECOMMENDED_TMUX_CONF = TMUX_DOJO_THEMES.catppuccin.conf;
+
+const MASTER_CHEATSHEET_ITEMS = [
+    { category: "Sessions", cmd: "tmux new -s <name>", desc: "Start a new named session" },
+    { category: "Sessions", cmd: "tmux new -s <name> -d", desc: "Start a detached session in the background" },
+    { category: "Sessions", cmd: "Ctrl+b $", desc: "Rename the active session interactively" },
+    { category: "Sessions", cmd: "Ctrl+b d", desc: "Detach client from current session" },
+    { category: "Sessions", cmd: "tmux attach -t <name>", desc: "Re-attach to an existing session" },
+    { category: "Sessions", cmd: "Ctrl+b s", desc: "Open interactive session tree chooser" },
+    { category: "Panes", cmd: "Ctrl+b %", desc: "Split active pane vertically (left/right)" },
+    { category: "Panes", cmd: "Ctrl+b \"", desc: "Split active pane horizontally (top/bottom)" },
+    { category: "Panes", cmd: "Ctrl+b z", desc: "Toggle Monocle Zoom on active pane" },
+    { category: "Panes", cmd: "Ctrl+b Space", desc: "Cycle panes through preset layouts" },
+    { category: "Panes", cmd: "Ctrl+b !", desc: "Break active pane out into its own standalone window" },
+    { category: "Panes", cmd: "tmux join-pane -s <src>", desc: "Graft a pane from another window into current split layout" },
+    { category: "Panes", cmd: "tmux respawn-pane -k", desc: "Kill hung process and restart shell inside pane in-place" },
+    { category: "Panes", cmd: "tmux display-popup -E <cmd>", desc: "Open a centered floating overlay terminal" },
+    { category: "Windows", cmd: "Ctrl+b c", desc: "Create a new window" },
+    { category: "Windows", cmd: "Ctrl+b ,", desc: "Rename the current window" },
+    { category: "Windows", cmd: "Ctrl+b 0..9 / n / p / l", desc: "Jump to window by index, next, previous, or last window" },
+    { category: "Windows", cmd: "Ctrl+b w", desc: "Interactive window & pane preview tree" },
+    { category: "Copy Mode", cmd: "setw -g mode-keys vi", desc: "Enable Vi navigation & selection keys in Copy Mode" },
+    { category: "Copy Mode", cmd: "Ctrl+b [", desc: "Enter Copy / Scrollback mode (q to exit)" },
+    { category: "Copy Mode", cmd: "Ctrl+b ]", desc: "Paste contents of active tmux copy buffer" },
+    { category: "Copy Mode", cmd: "tmux capture-pane -p > file", desc: "Headlessly scrape pane scrollback directly to a file" },
+    { category: "Shared Sockets", cmd: "tmux -S /tmp/pair.sock new -s warroom", desc: "Create session on explicit shared UNIX socket" },
+    { category: "Shared Sockets", cmd: "chmod 777 /tmp/pair.sock", desc: "Grant multi-user UNIX socket permissions" },
+    { category: "Shared Sockets", cmd: "tmux -S /tmp/pair.sock attach -r", desc: "Shadow shared session in Read-Only spectator mode" },
+    { category: "Shared Sockets", cmd: "tmux -S /tmp/pair.sock new -t warroom -s my-angle", desc: "Create grouped session sharing windows with independent focus" },
+    { category: "Format Variables", cmd: "#{?client_prefix,A,B}", desc: "Conditional ternary: evaluates to A when Prefix is active" },
+    { category: "Format Variables", cmd: "#{?pane_synchronized,SYNC,}", desc: "Conditional alert when synchronize-panes broadcast is active" },
+    { category: "Format Variables", cmd: "#{?window_zoomed_flag,[Z],}", desc: "Conditional indicator when active pane is zoomed" },
+    { category: "Format Variables", cmd: "#{pane_current_path} / #{pane_current_command}", desc: "Working directory or running binary of the active pane" },
+    { category: "Format Variables", cmd: "#(cut -d' ' -f1 /proc/loadavg)", desc: "Execute shell command and embed live stdout in status bar" },
+    { category: "Hooks", cmd: "tmux set-hook -g after-split-window <cmd>", desc: "Trigger automatic tmux command whenever any pane is split" },
+    { category: "Hooks", cmd: "tmux show-hooks -g", desc: "Inspect all registered global lifecycle event hooks" }
+];
+
+window.MASTER_CHEATSHEET_ITEMS = MASTER_CHEATSHEET_ITEMS;
 
 const TMUX_DOJO_KATAS = [
     // ========================================================================
@@ -377,7 +439,7 @@ const TMUX_DOJO_KATAS = [
     },
 
     // ========================================================================
-    // 🟫 KATA 4: BROWN BELT — Customizing Your Gi (5 Tasks)
+    // 🟫 KATA 4: BROWN BELT — Customizing Your Gi (6 Tasks)
     // ========================================================================
     {
         id: "kata-4-brown-belt",
@@ -436,12 +498,19 @@ const TMUX_DOJO_KATAS = [
                 hint: "Add <code>set -g status-interval 2</code> and the <code>set -g status-right ...</code> line to <code>~/.tmux.conf</code> and reload.",
                 checkCmd: 'tmux show-options -g status-right 2>/dev/null | grep -q "/proc/loadavg" && tmux show-options -g status-right 2>/dev/null | grep -q "pane_current_command" && echo OK',
                 autoSolveCmd: 'printf "set -g status-interval 2\\nset -g status-right \\"#[fg=#f9e2af]CMD:#{pane_current_command} #[fg=#89b4fa]| LOAD:#(cut -d\' \' -f1 /proc/loadavg) #[fg=#cdd6f4]| %%H:%%M \\"\\n" >> ~/.tmux.conf && tmux source-file ~/.tmux.conf'
+            },
+            {
+                id: "k4-t6-message-style",
+                description: "<strong>Command Prompt &amp; Alert Styling (<code>message-style</code>):</strong> Style the <code>Ctrl+b :</code> command prompt and status notifications to match your palette with <code>set -g message-style \"bg=#f9e2af,fg=#11111b,bold\"</code> and reload.",
+                hint: "Add <code>set -g message-style \"bg=#f9e2af,fg=#11111b,bold\"</code> to <code>~/.tmux.conf</code> and reload.",
+                checkCmd: 'tmux show-options -g message-style 2>/dev/null | grep -qi "#f9e2af" && echo OK',
+                autoSolveCmd: 'printf "set -g message-style \\"bg=#f9e2af,fg=#11111b,bold\\"\\n" >> ~/.tmux.conf && tmux source-file ~/.tmux.conf'
             }
         ]
     },
 
     // ========================================================================
-    // ⬛ KATA 5: BLACK BELT — Team Ops, Shared Sockets & Automation (6 Tasks)
+    // ⬛🟥 KATA 5: BLACK BELT — Team Ops, Shared Sockets & Automation (6 Tasks)
     // ========================================================================
     {
         id: "kata-5-black-belt",
@@ -523,125 +592,198 @@ const TMUX_DOJO_KATAS = [
             },
             {
                 id: "k5-t6-deploy-dojo-script",
-                description: "<strong>Automated Workspace Scripting:</strong> Write an executable script <code>/root/deploy-dojo.sh</code> (or run a chained command) that builds a multi-window session named <code>hq</code> with window <code>code</code> split into 2 panes and a second window named <code>logs</code>, completely non-interactively (<code>tmux new-session -d -s hq -n code \\; split-window -h \\; new-window -n logs</code>).",
+                description: "<strong>Automated Workspace Scripting:</strong> Detach from <code>/tmp/pair.sock</code> if attached, and build a multi-window session on the default server named <code>hq</code> with window <code>code</code> split into 2 panes and a second window named <code>logs</code> (<code>tmux new-session -d -s hq -n code \\; split-window -h \\; new-window -n logs</code>).",
                 hint: "Run <code>tmux new-session -d -s hq -n code \\; split-window -h \\; new-window -n logs</code> in your shell.",
                 checkCmd: 'tmux has-session -t hq 2>/dev/null && tmux list-windows -t hq -F "#{window_name}" | grep -qx "logs" && [ $(tmux list-panes -t hq:code 2>/dev/null | wc -l) -eq 2 ] && echo OK',
-                autoSolveCmd: 'printf "#!/bin/sh\\ntmux kill-session -t hq 2>/dev/null || true\\ntmux new-session -d -s hq -n code \\\\; split-window -h \\\\; new-window -n logs\\n" > /root/deploy-dojo.sh && chmod +x /root/deploy-dojo.sh && /root/deploy-dojo.sh'
+                onPassCmd: 'tmux -S /tmp/pair.sock detach-client 2>/dev/null || true',
+                autoSolveCmd: 'tmux -S /tmp/pair.sock detach-client 2>/dev/null || true; printf "#!/bin/sh\\ntmux kill-session -t hq 2>/dev/null || true\\ntmux new-session -d -s hq -n code \\\\; split-window -h \\\\; new-window -n logs\\n" > /root/deploy-dojo.sh && chmod +x /root/deploy-dojo.sh && /root/deploy-dojo.sh'
             }
         ]
     },
 
     // ========================================================================
-    // 🟥⬛ KATA 6: CORAL BELT — Open Mat (Sandbox, Theme Gallery & Master Cheat Sheet)
+    // 🟥⬛ KATA 6: CORAL BELT (7th Degree Master) — Invisible Jiu-Jitsu (5 Tasks)
     // ========================================================================
     {
         id: "kata-6-coral-belt",
         number: "KATA 06",
-        belt: "Coral Belt",
+        belt: "Coral Belt (Master)",
         beltColor: "coral",
-        title: "Open Mat (Sandbox, Theme Gallery & Master Cheat Sheet)",
-        isSandbox: true,
-        hasSandboxExtras: true,
+        title: "Invisible Jiu-Jitsu (Popups, Event Hooks & Pane Surgery)",
         theory: `
             <p>
-                <em>Oss!</em> You have progressed from White Belt survival to Black Belt multi-user War Rooms and workspace
-                automation. Welcome to <strong>Coral Belt Open Mat</strong>—experiment freely with the 3 one-click
-                <code>~/.tmux.conf</code> themes below, inspect them in the <strong>[ ~/.tmux.conf Editor ]</strong> tab,
-                or use the Master Cheat Sheet as your permanent reference.
+                <em>Philosophy:</em> In BJJ, 7th Degree Coral Belts practice <strong>"Invisible Jiu-Jitsu"</strong>—subtle
+                weight shifts and hidden mechanics that feel like magic to lower belts. In <code>tmux</code>, this means
+                surgical pane grafting across windows (<code>join-pane</code>), headless screen scraping (<code>capture-pane</code>),
+                event-driven hooks (<code>set-hook</code>), floating popups (<code>display-popup</code>), and in-place pane resurrection (<code>respawn-pane -k</code>).
+            </p>
+            <div class="theory-callout">
+                <div class="theory-callout-title">Master-Level Primitives</div>
+                <ul class="theory-keylist">
+                    <li><span><code>tmux join-pane -s donor</code></span> <span>Graft a window/pane directly into your active split layout</span></li>
+                    <li><span><code>tmux capture-pane -p &gt; /tmp/audit.log</code></span> <span>Scrape pane scrollback headlessly into a file</span></li>
+                    <li><span><code>tmux set-hook -g after-split-window "..."</code></span> <span>Trigger automatic commands on lifecycle events</span></li>
+                    <li><span><code>bind g display-popup -w 80% -h 80%</code></span> <span>Summon a centered floating scratchpad terminal</span></li>
+                    <li><span><code>bind K respawn-pane -k</code></span> <span>Restart a hung or corrupted pane shell in-place</span></li>
+                </ul>
+            </div>
+        `,
+        tasks: [
+            {
+                id: "k6-t1-surgical-join-pane",
+                description: "<strong>Surgical Pane Grafting (<code>join-pane</code>):</strong> Earlier you broke a pane into a window (<code>!</code>). A Master can pull a pane from <em>another</em> window and graft it directly into the current split layout. Create a new window named <code>donor</code> (<code>tmux new-window -n donor</code>), switch back to your previous window (<kbd>Ctrl+b</kbd> <kbd>l</kbd>), and pull <code>donor</code> into your current window as a split pane (<code>tmux join-pane -s donor</code>).",
+                hint: "Run <code>tmux new-window -n donor \\; last-window \\; join-pane -s donor</code> (or run each step inside your default tmux session).",
+                checkCmd: '! tmux list-windows -F "#{window_name}" 2>/dev/null | grep -qx "donor" && [ $(tmux list-panes 2>/dev/null | wc -l) -ge 2 ] && echo OK',
+                autoSolveCmd: 'tmux has-session 2>/dev/null || tmux new-session -d -s dojo; tmux new-window -n donor \\; last-window \\; join-pane -s donor'
+            },
+            {
+                id: "k6-t2-headless-capture-pane",
+                description: "<strong>Headless Screen Scraping (<code>capture-pane</code> &amp; <code>save-buffer</code>):</strong> Instead of manually selecting text with a mouse, <code>capture-pane</code> snapshots the scrollback history of any pane directly into a buffer or file. Capture the visible contents of the active pane and dump it to <code>/tmp/audit.log</code> (<code>tmux capture-pane -p &gt; /tmp/audit.log</code> or <code>tmux capture-pane \\; save-buffer /tmp/audit.log</code>).",
+                hint: "Run <code>tmux capture-pane -p &gt; /tmp/audit.log</code> in your terminal.",
+                checkCmd: '[ -s /tmp/audit.log ] && echo OK',
+                autoSolveCmd: 'tmux send-keys "echo DOJO_MASTER_LOG" C-m; tmux capture-pane -p > /tmp/audit.log; [ -s /tmp/audit.log ] || echo "DOJO_MASTER_LOG" > /tmp/audit.log'
+            },
+            {
+                id: "k6-t3-event-hook-split",
+                description: "<strong>Event-Driven Automation (<code>set-hook</code>):</strong> Why run commands manually when <code>tmux</code> can react to lifecycle events automatically? Register a global hook on <code>after-split-window</code> that automatically selects the <code>even-horizontal</code> layout whenever any pane is split:<br/><code>tmux set-hook -g after-split-window \"select-layout even-horizontal\"</code>.",
+                hint: "Run <code>tmux set-hook -g after-split-window \"select-layout even-horizontal\"</code>.",
+                checkCmd: 'tmux show-hooks -g 2>/dev/null | grep -q "after-split-window.*even-horizontal" && echo OK',
+                autoSolveCmd: 'tmux set-hook -g after-split-window "select-layout even-horizontal"'
+            },
+            {
+                id: "k6-t4-floating-popup-bind",
+                description: "<strong>Floating Scratchpad Terminal (<code>display-popup</code> Binding):</strong> Modern <code>tmux</code> (3.2+) supports floating overlay windows (<code>display-popup</code>) that appear centered over your workspace. Bind <kbd>Prefix</kbd> + <kbd>g</kbd> (e.g., <code>tmux bind g display-popup -w 80% -h 80%</code> or <code>tmux bind g display-popup -E \"echo 'Master Popup'; sleep 1\"</code>) so pressing <kbd>Ctrl+b</kbd> <kbd>g</kbd> opens a centered floating popup window.",
+                hint: "Run <code>tmux bind g display-popup -w 80% -h 80% -E \"echo 'Master Popup'; sleep 1\"</code> (or add <code>bind g display-popup -w 80% -h 80%</code> to <code>~/.tmux.conf</code> and reload).",
+                checkCmd: 'tmux list-keys 2>/dev/null | grep -q "display-popup" && echo OK',
+                autoSolveCmd: 'tmux bind g display-popup -w 80% -h 80% -E "echo Master_Popup; sleep 1"'
+            },
+            {
+                id: "k6-t5-respawn-dead-pane",
+                description: "<strong>Respawn a Dead Pane (<code>respawn-pane -k</code>):</strong> When a process hangs or a shell state gets corrupted, you don't need to destroy and recreate your carefully sized pane layout. Bind <kbd>Prefix</kbd> + <kbd>K</kbd> (uppercase <code>K</code>) to forcefully respawn the active pane in-place (<code>tmux bind K respawn-pane -k</code>).",
+                hint: "Run <code>tmux bind K respawn-pane -k</code> (or add <code>bind K respawn-pane -k</code> to <code>~/.tmux.conf</code> and reload).",
+                checkCmd: 'tmux list-keys 2>/dev/null | grep -q "respawn-pane -k" && echo OK',
+                autoSolveCmd: 'tmux bind K respawn-pane -k'
+            }
+        ]
+    },
+
+    // ========================================================================
+    // 🟥 KATA 7: RED BELT (Grandmaster) — The Art of Effortlessness (2 Tasks + Vault)
+    // ========================================================================
+    {
+        id: "kata-7-red-belt",
+        number: "KATA 07",
+        belt: "Red Belt (Grandmaster)",
+        beltColor: "red",
+        title: "The Art of Effortlessness (Idempotent Architecture & The Grandmaster's Vault)",
+        hasGrandmasterVault: true,
+        theory: `
+            <p>
+                <em>Philosophy:</em> In Brazilian Jiu-Jitsu, the 9th/10th Degree <strong>Red Belt</strong> is reserved for
+                Grandmasters who have spent a lifetime perfecting the art. At this pinnacle, there is no wasted motion:
+                you don't build workspaces by hand—you summon entire fault-tolerant environments with a single idempotent
+                command, and the Dojo becomes your permanent open mat.
             </p>
         `,
-        tasks: [],
+        tasks: [
+            {
+                id: "k7-t1-idempotent-grandmaster-script",
+                description: "<strong>Craft an Idempotent Workspace Launcher (<code>/root/grandmaster.sh</code>):</strong> Create an executable script <code>/root/grandmaster.sh</code> (<code>chmod +x /root/grandmaster.sh</code>) that checks if session <code>sanctum</code> exists (<code>tmux has-session -t sanctum 2&gt;/dev/null</code>) and creates a detached session named <code>sanctum</code> with:<br/>• Window 1 named <code>command</code> containing 2 panes.<br/>• Window 2 named <code>watchtower</code> where <code>send-keys</code> automatically executes <code>echo \"SANCTUM_ONLINE\" &gt; /tmp/sanctum.status</code>.",
+                hint: "Create <code>/root/grandmaster.sh</code>, mark it executable with <code>chmod +x /root/grandmaster.sh</code>, and run <code>/root/grandmaster.sh</code>.",
+                checkCmd: '[ -x /root/grandmaster.sh ] && tmux has-session -t sanctum 2>/dev/null && tmux list-windows -t sanctum -F "#{window_name}" | grep -qx "watchtower" && grep -q "SANCTUM_ONLINE" /tmp/sanctum.status 2>/dev/null && echo OK',
+                autoSolveCmd: 'printf "#!/bin/sh\\nif ! tmux has-session -t sanctum 2>/dev/null; then\\n  tmux new-session -d -s sanctum -n command\\n  tmux split-window -h -t sanctum:command\\n  tmux new-window -t sanctum -n watchtower\\n  tmux send-keys -t sanctum:watchtower \\"echo SANCTUM_ONLINE > /tmp/sanctum.status\\" C-m\\n  tmux select-window -t sanctum:command\\nfi\\necho SANCTUM_ONLINE > /tmp/sanctum.status\\n" > /root/grandmaster.sh && chmod +x /root/grandmaster.sh && /root/grandmaster.sh'
+            },
+            {
+                id: "k7-t2-grandmaster-conf",
+                description: "<strong>Lock in the Grandmaster <code>.tmux.conf</code>:</strong> Combine all ergonomic, aesthetic, and operational principles into one cohesive configuration file (or click any of the <strong>Grandmaster's Vault</strong> presets below!) so that <code>/root/.tmux.conf</code> contains at least 8 active configuration directives and is loaded into the running server.",
+                hint: "Click any of the 3 <strong>Grandmaster's Vault</strong> preset buttons below (or click <strong>⚡ Auto-Complete Step</strong>) to forge and load a complete Grandmaster <code>~/.tmux.conf</code>.",
+                checkCmd: '[ $(grep -Ev "^[[:space:]]*(#|$)" ~/.tmux.conf 2>/dev/null | wc -l) -ge 8 ] && echo OK',
+                autoSolveCmd: 'if [ $(grep -Ev "^[[:space:]]*(#|$)" ~/.tmux.conf 2>/dev/null | wc -l) -lt 8 ]; then printf "set -g mouse on\\nsetw -g mode-keys vi\\nset -g base-index 1\\nsetw -g pane-base-index 1\\nset -g renumber-windows on\\nset -g prefix2 C-a\\nbind | split-window -h\\nbind - split-window -v\\nbind K respawn-pane -k\\n" >> ~/.tmux.conf; fi && tmux source-file ~/.tmux.conf 2>/dev/null || true'
+            }
+        ],
         sandboxFooterHtml: `
-            <div class="theme-gallery-card">
+            <div class="sandbox-action-box theme-gallery-card grandmaster-vault-card">
                 <div class="theme-gallery-header">
-                    <span class="theme-gallery-title">🎨 One-Click ~/.tmux.conf Theme Gallery</span>
-                    <span class="theme-gallery-sub">Applies &amp; hot-reloads live via ttyS1</span>
+                    <div class="theme-gallery-title">🏛️ The Grandmaster's Vault (One-Click Config Injectors)</div>
+                    <p class="theme-gallery-sub">
+                        Click any Grandmaster edition below to write it to <code>/root/.tmux.conf</code> via <code>ttyS1</code>,
+                        hot-reload your running <code>tmux</code> server, and inspect every line in the <strong>[ ~/.tmux.conf Editor ]</strong> tab.
+                    </p>
                 </div>
                 <div class="theme-preset-grid">
+                    <button type="button" class="theme-preset-btn" data-theme-key="gracie">
+                        <div class="theme-btn-top">
+                            <span class="theme-btn-name">🥋 1. Gracie Classic (Minimalist High-Contrast)</span>
+                            <span class="theme-swatches">
+                                <span class="swatch" style="background:#090d14"></span>
+                                <span class="swatch" style="background:#f8fafc"></span>
+                                <span class="swatch" style="background:#ef4444"></span>
+                            </span>
+                        </div>
+                        <span class="theme-btn-desc">Ultra-low resource usage, instant response (escape-time 0), zero visual clutter, Vi copy-mode, Ctrl+a prefix</span>
+                    </button>
+
                     <button type="button" class="theme-preset-btn" data-theme-key="catppuccin">
-                        <div class="theme-preset-top">
+                        <div class="theme-btn-top">
+                            <span class="theme-btn-name">🎨 2. Catppuccin Mocha Telemetry</span>
                             <span class="theme-swatches">
-                                <span style="background:#1e1e2e"></span>
-                                <span style="background:#a6e3a1"></span>
-                                <span style="background:#89b4fa"></span>
-                                <span style="background:#f38ba8"></span>
+                                <span class="swatch" style="background:#1e1e2e"></span>
+                                <span class="swatch" style="background:#a6e3a1"></span>
+                                <span class="swatch" style="background:#89b4fa"></span>
+                                <span class="swatch" style="background:#f38ba8"></span>
                             </span>
-                            <strong>1. Catppuccin Mocha Dojo</strong>
                         </div>
-                        <p>Modern dark pastel with dynamic Red/Green Prefix badge &amp; live CPU load</p>
+                        <span class="theme-btn-desc">Full 24-bit hex theming, conditional client_prefix badge, live /proc/loadavg &amp; memory telemetry, repeatable resize binds</span>
                     </button>
 
-                    <button type="button" class="theme-preset-btn" data-theme-key="matrix">
-                        <div class="theme-preset-top">
+                    <button type="button" class="theme-preset-btn" data-theme-key="warroom">
+                        <div class="theme-btn-top">
+                            <span class="theme-btn-name">🚨 3. SysAdmin War Room Edition</span>
                             <span class="theme-swatches">
-                                <span style="background:#000000"></span>
-                                <span style="background:#00ff66"></span>
-                                <span style="background:#008833"></span>
-                                <span style="background:#ff0055"></span>
+                                <span class="swatch" style="background:#0b1019"></span>
+                                <span class="swatch" style="background:#dc2626"></span>
+                                <span class="swatch" style="background:#f59e0b"></span>
+                                <span class="swatch" style="background:#38bdf8"></span>
                             </span>
-                            <strong>2. Cyberpunk Matrix</strong>
                         </div>
-                        <p>High-contrast neon phosphor green on pure black with minimal borders</p>
-                    </button>
-
-                    <button type="button" class="theme-preset-btn" data-theme-key="zen">
-                        <div class="theme-preset-top">
-                            <span class="theme-swatches">
-                                <span style="background:#0e141f"></span>
-                                <span style="background:#647792"></span>
-                                <span style="background:#9fb0c7"></span>
-                                <span style="background:#f59e0b"></span>
-                            </span>
-                            <strong>3. Minimalist Zen</strong>
-                        </div>
-                        <p>Distraction-free top status bar with muted slate &amp; monochrome typography</p>
+                        <span class="theme-btn-desc">Multi-user incident ops: Prefix+S sync toggle with bright red #[bg=red] SYNC ON warning badge &amp; Prefix+P capture-pane logging</span>
                     </button>
                 </div>
                 <div id="inject-sensei-feedback" class="inject-sensei-feedback" aria-live="polite"></div>
             </div>
 
-            <div class="master-cheatsheet">
-                <div class="cheatsheet-section">
-                    <h4>Sessions &amp; Server</h4>
-                    <ul class="theory-keylist">
-                        <li><span><code>tmux new -s name</code></span> <span>Start named session</span></li>
-                        <li><span><code>tmux new -s name -d</code></span> <span>Start detached background session</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>$</kbd></span> <span>Rename active session</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>d</kbd></span> <span>Detach from session</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>s</kbd></span> <span>Interactive session tree chooser</span></li>
-                    </ul>
+            <div class="interactive-cheatsheet-card" id="interactive-cheatsheet-card">
+                <div class="cheatsheet-card-header">
+                    <div class="theme-gallery-title">📜 Interactive Master Cheat Sheet</div>
+                    <input
+                        type="search"
+                        id="cheatsheet-search-input"
+                        class="cheatsheet-search-input"
+                        placeholder="Search commands, flags, #{variables}, or hooks..."
+                        aria-label="Search Master Cheat Sheet"
+                    />
+                    <div class="cheatsheet-filter-pills" id="cheatsheet-filter-pills">
+                        <button type="button" class="cheatsheet-pill active" data-category="All">All</button>
+                        <button type="button" class="cheatsheet-pill" data-category="Sessions">Sessions</button>
+                        <button type="button" class="cheatsheet-pill" data-category="Panes">Panes</button>
+                        <button type="button" class="cheatsheet-pill" data-category="Windows">Windows</button>
+                        <button type="button" class="cheatsheet-pill" data-category="Copy Mode">Copy Mode</button>
+                        <button type="button" class="cheatsheet-pill" data-category="Shared Sockets">Shared Sockets (-S)</button>
+                        <button type="button" class="cheatsheet-pill" data-category="Format Variables">Format Variables (#{...})</button>
+                        <button type="button" class="cheatsheet-pill" data-category="Hooks">Hooks</button>
+                    </div>
                 </div>
-
-                <div class="cheatsheet-section">
-                    <h4>Panes &amp; Windows</h4>
-                    <ul class="theory-keylist">
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>%</kbd> / <kbd>"</kbd></span> <span>Split vertically / horizontally</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>z</kbd></span> <span>Toggle pane Monocle Zoom</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>Space</kbd></span> <span>Cycle preset pane layouts</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>c</kbd> / <kbd>,</kbd></span> <span>Create / Rename window</span></li>
-                        <li><span><kbd>Ctrl+b</kbd> <kbd>!</kbd></span> <span>Break pane into standalone window</span></li>
-                    </ul>
-                </div>
-
-                <div class="cheatsheet-section">
-                    <h4>Keybinding Modifiers &amp; Vi Mode</h4>
-                    <ul class="theory-keylist">
-                        <li><span><code>setw -g mode-keys vi</code></span> <span>Enable Vi navigation in Copy Mode (<kbd>Ctrl+b</kbd> <kbd>[</kbd>)</span></li>
-                        <li><span><code>set -g prefix2 C-a</code></span> <span>Add secondary <kbd>Ctrl+a</kbd> prefix</span></li>
-                        <li><span><code>bind -n M-Left select-pane -L</code></span> <span>Root table (<code>-n</code>): switch panes with <kbd>Alt+Left</kbd></span></li>
-                        <li><span><code>bind -r H resize-pane -L 5</code></span> <span>Repeatable (<code>-r</code>): tap <kbd>H</kbd> repeatedly to resize</span></li>
-                    </ul>
-                </div>
-
-                <div class="cheatsheet-section">
-                    <h4>Status Bar Telemetry &amp; Multi-User</h4>
-                    <ul class="theory-keylist">
-                        <li><span><code>#{?client_prefix,PREFIX,#S}</code></span> <span>Dynamic conditional Prefix indicator</span></li>
-                        <li><span><code>#(cut -d' ' -f1 /proc/loadavg)</code></span> <span>Embed live shell telemetry in bar</span></li>
-                        <li><span><code>tmux -S /tmp/pair.sock new -s warroom</code></span> <span>Create shared multi-user socket</span></li>
-                        <li><span><code>tmux -S /tmp/pair.sock attach -r</code></span> <span>Shadow session in Read-Only mode</span></li>
-                        <li><span><code>tmux -S /tmp/pair.sock new -t warroom -s view2</code></span> <span>Grouped session with independent window focus</span></li>
-                    </ul>
+                <div class="cheatsheet-table-wrapper">
+                    <table class="cheatsheet-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Command / Keybinding</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cheatsheet-table-body"></tbody>
+                    </table>
                 </div>
             </div>
         `
@@ -649,6 +791,6 @@ const TMUX_DOJO_KATAS = [
 ];
 
 window.TMUX_DOJO_THEMES = TMUX_DOJO_THEMES;
-window.TMUX_DOJO_KATAS = TMUX_DOJO_KATAS;
 window.SENSEI_RECOMMENDED_TMUX_CONF = SENSEI_RECOMMENDED_TMUX_CONF;
+window.TMUX_DOJO_KATAS = TMUX_DOJO_KATAS;
 // @license-end
