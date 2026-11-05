@@ -7,7 +7,7 @@
 ## Key Features
 
 - **Real Linux + Real `tmux` in WebAssembly**: Runs an authentic Alpine Linux v3.21 (`x86`) kernel (`linux-virt`) and `initramfs` with `tmux`, `bash`, `nano`, and `ncurses` pre-installed—no backend server or WebSocket container required.
-- **Instant (<1s) Browser Boot**: Pre-snapshots the booted 32 MB RAM VM into `/public/v86/initial_state.bin` so the interactive `dojo:~#` prompt is ready in under 1 second.
+- **Instant (<1s) Browser Boot**: Pre-snapshots the booted 32 MB RAM VM into `/public/v86/initial_state.bin` so the interactive `dojo:~#` prompt is ready in under 1 second. Note: the first page load downloads this ~44 MB snapshot file (a normal static asset, subject to browser HTTP caching); if it is missing, the app falls back to a full cold boot of `bzImage` + `initramfs.cpio.gz`.
 - **Dual-Serial-Port Telemetry Architecture (`ttyS0` + `ttyS1`)**:
   - **`ttyS0` (User Terminal)**: Connected directly to `xterm.js` (`TERM=xterm-256color`) with keyboard shortcut interception so browser shortcuts like `Ctrl+b` (bookmarks) are blocked and forwarded as `\x02` to `tmux`.
   - **`ttyS1` (Silent Telemetry & Resize Bridge)**: Runs a background evaluation daemon (`/usr/local/bin/telemetry-daemon`). The browser's `VmInspector` sends shell probes and `stty -F /dev/ttyS0 rows <R> cols <C>` resize commands over `ttyS1` and parses responses wrapped in `___EVAL_START___` / `___EVAL_END___` markers without ever polluting the user's terminal on `ttyS0`.
@@ -68,7 +68,7 @@ To rebuild the 32-bit Alpine Linux kernel (`bzImage`), root filesystem (`initram
 ./build-image/build.sh
 ```
 
-By default, `build.sh` uses `build_rootfs.py` (which downloads official 32-bit Alpine packages directly from `dl-cdn.alpinelinux.org` and packs the `newc` `cpio.gz` archive without requiring root privileges or a running Docker daemon) and then runs `generate_snapshot.js` in Node.js to produce `/public/v86/initial_state.bin`. You can also build with Docker by running `USE_DOCKER=1 ./build-image/build.sh`.
+By default, `build.sh` uses `build_rootfs.py` (which downloads official 32-bit Alpine packages directly from `dl-cdn.alpinelinux.org` and packs the `newc` `cpio.gz` archive without requiring root privileges or a running Docker daemon) and then runs `generate_snapshot.js` in Node.js to produce `/public/v86/initial_state.bin`. You can also build with Docker by running `USE_DOCKER=1 ./build-image/build.sh`. The v86 runtime is pinned to `V86_VERSION` (default `0.5.473`); `build-image/patch_libv86.py` patches the minified `libv86.js` and aborts with a clear error if any patch no longer matches upstream — see [`build-image/README.md`](build-image/README.md).
 
 ---
 

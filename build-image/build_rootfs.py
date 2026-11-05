@@ -42,6 +42,7 @@ TARGET_PACKAGES = [
     "nano",
     "ncurses",
     "ncurses-terminfo-base",
+    "ncurses-terminfo",
     "libevent",
 ]
 
@@ -450,6 +451,10 @@ def configure_tmux_dojo_rootfs(cpio: CpioArchiveBuilder):
         "export HOME=/root\n"
         "export USER=root\n"
         "export TERM=xterm-256color\n\n"
+        "# TRUST BOUNDARY: this daemon evals every line received on ttyS1 as root.\n"
+        "# The VM is fully isolated inside the browser (v86 has no network access in\n"
+        "# this configuration), so the only writer to ttyS1 is the tmux-dojo page\n"
+        "# JavaScript itself. Do not expose ttyS1 to any untrusted input source.\n\n"
         "# Configure ttyS1 into canonical line-buffered mode with echo disabled and CR->NL translation\n"
         "stty -F /dev/ttyS1 115200 sane -echo icrnl onlcr 2>/dev/null || stty sane -echo icrnl onlcr 2>/dev/null || true\n\n"
         "while IFS= read -r cmd; do\n"

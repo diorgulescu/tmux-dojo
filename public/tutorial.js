@@ -440,7 +440,7 @@ class TutorialEngine {
         const navTabsHtml = this.katas
             .map((k, idx) => {
                 const isCurrent = idx === this.currentKataIndex;
-                const isDone = k.isSandbox ? progress.done === progress.total : this.isKataComplete(k);
+                const isDone = this.isKataComplete(k);
                 return `
                     <button
                         type="button"

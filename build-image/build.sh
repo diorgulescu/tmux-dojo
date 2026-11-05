@@ -12,6 +12,14 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 V86_DIR="$PROJECT_ROOT/public/v86"
+V86_CACHE_DIR="$SCRIPT_DIR/.v86-cache"
+
+# Pinned v86 release. patch_libv86.py asserts that every minified-JS patch
+# matches exactly once and fails loudly if upstream changes — override
+# V86_VERSION only after updating build-image/patch_libv86.py.
+V86_VERSION="${V86_VERSION:-0.5.473}"
+V86_TARBALL_URL="https://registry.npmjs.org/v86/-/v86-${V86_VERSION}.tgz"
+V86_TARBALL="$V86_CACHE_DIR/v86-${V86_VERSION}.tgz"
 
 mkdir -p "$V86_DIR"
 
@@ -19,63 +27,20 @@ echo "============================================================"
 echo " tmux-dojo: v86 Assets & Custom Alpine Linux Image Builder"
 echo "============================================================"
 
-# 1. Download latest v86 browser build files if missing or requested
+# 1. Download the pinned v86 npm tarball and extract/patch its assets
 download_v86_assets() {
-    echo "=== Checking / downloading v86 browser runtime & BIOS files ==="
-    local NPM_TARBALL_URL
-    NPM_TARBALL_URL="$(python3 -c '
-import json, urllib.request
-req = urllib.request.Request("https://registry.npmjs.org/v86/latest", headers={"User-Agent": "tmux-dojo/1.0"})
-with urllib.request.urlopen(req, timeout=30) as r:
-    data = json.loads(r.read().decode("utf-8"))
-print(data["dist"]["tarball"])
-')"
-    echo "  -> Fetching latest v86 release from $NPM_TARBALL_URL"
-    python3 -c "
-import io, tarfile, urllib.request
-from pathlib import Path
+    echo "=== Downloading v86 v${V86_VERSION} browser runtime & extracting assets ==="
+    mkdir -p "$V86_CACHE_DIR"
+    if [ ! -f "$V86_TARBALL" ]; then
+        echo "  -> Fetching $V86_TARBALL_URL"
+        curl -fsSL "$V86_TARBALL_URL" -o "$V86_TARBALL"
+    else
+        echo "  -> Using cached $V86_TARBALL"
+    fi
+    # patch_libv86.py verifies each patch applies exactly once, aborting on mismatch
+    python3 "$SCRIPT_DIR/patch_libv86.py" "$V86_TARBALL" "$V86_DIR"
 
-url = '$NPM_TARBALL_URL'
-out_dir = Path('$V86_DIR')
-req = urllib.request.Request(url, headers={'User-Agent': 'tmux-dojo/1.0'})
-raw = urllib.request.urlopen(req, timeout=60).read()
-with tarfile.open(fileobj=io.BytesIO(raw), mode='r:gz') as tf:
-    for m in tf.getmembers():
-        if m.name.endswith('/build/libv86.js') or m.name == 'package/build/libv86.js':
-            js_code = tf.extractfile(m).read().decode('utf-8')
-            # Support initrd placement when memory_size < 64MB (e.g. 32MB RAM)
-            js_code = js_code.replace(
-                'c&&(h=67108864,e=c.byteLength,a.set(new Uint8Array(c),h));',
-                'c&&(h=a.byteLength>67108864+c.byteLength?67108864:(a.byteLength-c.byteLength)&-4096,e=c.byteLength,a.set(new Uint8Array(c),h));'
-            )
-            js_code = js_code.replace(
-                'this.create_memory(a.memory_size||67108864,a.initrd?67108864:1048576)',
-                'this.create_memory(a.memory_size||67108864,(a.initrd||a.initial_state)?67108864:1048576)'
-            )
-            # Export both V86 and V86Starter
-            js_code = js_code.replace(
-                '\"undefined\"!==typeof module&&\"undefined\"!==typeof module.exports?module.exports.V86=Q:\"undefined\"!==typeof window?window.V86=Q:\"function\"===typeof importScripts&&(self.V86=Q);',
-                '\"undefined\"!==typeof module&&\"undefined\"!==typeof module.exports?(module.exports.V86=Q,module.exports.V86Starter=Q):\"undefined\"!==typeof window?(window.V86=Q,window.V86Starter=Q):\"function\"===typeof importScripts&&(self.V86=Q,self.V86Starter=Q);'
-            )
-            # Emit both *-output-byte and *-output-char / serial-output-char
-            js_code = js_code.replace(
-                'this.modem_control&16?this.data_received(a):this.bus.send(\"serial\"+this.com+\"-output-byte\",a)',
-                'this.modem_control&16?this.data_received(a):(this.bus.send(\"serial\"+this.com+\"-output-byte\",a),this.bus.send(\"serial\"+this.com+\"-output-char\",String.fromCharCode(a)),0===this.com&&this.bus.send(\"serial-output-char\",String.fromCharCode(a)))'
-            )
-            (out_dir / 'libv86.js').write_text(js_code, encoding='utf-8')
-            print('  -> Extracted & patched libv86.js')
-        elif m.name.endswith('/build/v86.wasm') or m.name == 'package/build/v86.wasm':
-            (out_dir / 'v86.wasm').write_bytes(tf.extractfile(m).read())
-            print('  -> Extracted v86.wasm')
-        elif m.name.endswith('/bios/seabios.bin'):
-            (out_dir / 'seabios.bin').write_bytes(tf.extractfile(m).read())
-            print('  -> Extracted seabios.bin')
-        elif m.name.endswith('/bios/vgabios.bin'):
-            (out_dir / 'vgabios.bin').write_bytes(tf.extractfile(m).read())
-            print('  -> Extracted vgabios.bin')
-"
-
-    # If BIOS files weren't bundled inside the npm tarball, download from copy/v86 master repository
+    # BIOS ROMs are not bundled in the npm tarball: download from copy/v86 if missing
     if [ ! -f "$V86_DIR/seabios.bin" ]; then
         echo "  -> Downloading seabios.bin from github.com/copy/v86..."
         curl -fsSL "https://raw.githubusercontent.com/copy/v86/master/bios/seabios.bin" -o "$V86_DIR/seabios.bin"

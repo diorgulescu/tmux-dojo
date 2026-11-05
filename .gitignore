@@ -1,5 +1,8 @@
 # Cache downloaded Alpine Linux APK files during local builds
 build-image/.apk-cache/
 build-image/.rootfs-tmp/
+# Cache downloaded v86 npm tarballs during local builds
+build-image/.v86-cache/
 .DS_Store
 node_modules/
+__pycache__/

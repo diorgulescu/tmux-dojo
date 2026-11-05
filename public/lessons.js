@@ -290,7 +290,7 @@ const TMUX_DOJO_KATAS = [
             {
                 id: "k1-t6-transition-sessions",
                 description: "<strong>Transition Between Sessions (<kbd>Ctrl+b</kbd> <kbd>s</kbd>):</strong> Without detaching, open the interactive session chooser (<kbd>Ctrl+b</kbd> <kbd>s</kbd>), select <code>drills</code>, and press <kbd>Enter</kbd>.",
-                hint: "Press <kbd>Ctrl+b</kbd> then <kbd>s</kbd>, use the arrow keys to highlight <code>drills</code>, and press <kbd>Enter</kbd> (or press <kbd>Ctrl+b</kbd> <kbd>)</kbd>).",
+                hint: "Press <kbd>Ctrl+b</kbd> then <kbd>s</kbd>, use the arrow keys to highlight <code>drills</code>, and press <kbd>Enter</kbd>.",
                 checkCmd: 'tmux list-sessions -F "#{session_name}:#{session_attached}" 2>/dev/null | grep -qx "drills:1" && echo OK',
                 autoSolveCmd: 'tmux has-session -t drills 2>/dev/null || tmux new-session -d -s drills; tmux switch-client -t drills 2>/dev/null || true'
             }
@@ -547,7 +547,8 @@ const TMUX_DOJO_KATAS = [
                 id: "k5-t2-socket-permissions",
                 description: "<strong>Configure Multi-User Socket Permissions (<code>chmod</code> / <code>chgrp</code>):</strong> Unlock <code>/tmp/pair.sock</code> (<code>chmod 777 /tmp/pair.sock</code> or group <code>devops</code> with <code>770</code>) so user <code>teammate</code> can inspect the server.",
                 hint: "Run <code>chmod 777 /tmp/pair.sock</code> (or <code>chgrp devops /tmp/pair.sock &amp;&amp; chmod 770 /tmp/pair.sock</code>).",
-                checkCmd: 'tmux -S /tmp/pair.sock server-access -a teammate 2>/dev/null || true; su - teammate -c "tmux -S /tmp/pair.sock list-sessions" >/dev/null 2>&1 && echo OK',
+                checkCmd: 'su - teammate -c "tmux -S /tmp/pair.sock list-sessions" >/dev/null 2>&1 && echo OK',
+                onPassCmd: 'tmux -S /tmp/pair.sock server-access -a teammate 2>/dev/null || true',
                 autoSolveCmd: 'chgrp devops /tmp/pair.sock 2>/dev/null || true; chmod 777 /tmp/pair.sock'
             },
             {

@@ -48,6 +48,11 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 export HOME=/root
 export TERM=xterm-256color
 
+# TRUST BOUNDARY: this daemon evals every line received on ttyS1 as root.
+# The VM is fully isolated inside the browser (v86 has no network access in
+# this configuration), so the only writer to ttyS1 is the tmux-dojo page
+# JavaScript itself. Do not expose ttyS1 to any untrusted input source.
+
 # Configure ttyS1 in canonical line mode with echo disabled and CR->NL translation
 stty -F /dev/ttyS1 115200 sane -echo icrnl onlcr 2>/dev/null || stty sane -echo icrnl onlcr 2>/dev/null || true
 
@@ -63,7 +68,7 @@ done
 EOF
 RUN chmod +x /usr/local/bin/telemetry-daemon
 
-# Create auto-login wrapper for ttyS0
+# Create auto-login wrapper for ttyS0 (kept in sync with build_rootfs.py)
 RUN cat << 'EOF' > /usr/local/bin/autologin-ttyS0
 #!/bin/sh
 export TERM=xterm-256color
@@ -73,7 +78,9 @@ export LOGNAME=root
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 cd /root
 stty rows 24 cols 80 2>/dev/null || true
-exec /bin/bash --login
+clear 2>/dev/null || true
+printf '\033[1;32mWelcome to tmux-dojo!\033[0m Type \033[1;36mtmux\033[0m to begin.\n\n'
+exec /bin/bash --login -i
 EOF
 RUN chmod +x /usr/local/bin/autologin-ttyS0
 
