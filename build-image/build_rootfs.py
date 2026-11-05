@@ -355,9 +355,10 @@ def create_busybox_applets(cpio: CpioArchiveBuilder):
 def configure_tmux_dojo_rootfs(cpio: CpioArchiveBuilder):
     """Applies tmux-dojo customizations: hostname, bash prompt, ttyS0 auto-login, ttyS1 telemetry."""
     # Ensure standard directories exist
-    for d in ["proc", "sys", "dev", "dev/pts", "dev/shm", "tmp", "run", "var/run", "var/lock", "root", "etc", "usr/local/bin"]:
+    for d in ["proc", "sys", "dev", "dev/pts", "dev/shm", "tmp", "run", "var/run", "var/lock", "root", "home", "etc", "usr/local/bin"]:
         cpio.add_dir(d, mode=0o755)
     cpio.add_dir("tmp", mode=0o1777)
+    cpio.add_dir("home/teammate", mode=0o755, uid=1000, gid=1000)
 
     # Pre-populate essential /dev device nodes in case devtmpfs isn't mounted yet
     cpio.add_chardev("dev/console", 5, 1, mode=0o600)
@@ -380,11 +381,12 @@ def configure_tmux_dojo_rootfs(cpio: CpioArchiveBuilder):
         mode=0o644,
     )
 
-    # 2. /etc/passwd and /etc/group with /bin/bash as default shell for root
+    # 2. /etc/passwd and /etc/group with /bin/bash as default shell for root & non-root user `teammate` in group `devops`
     passwd_content = (
         "root:x:0:0:root:/root:/bin/bash\n"
         "bin:x:1:1:bin:/bin:/sbin/nologin\n"
         "daemon:x:2:2:daemon:/sbin:/sbin/nologin\n"
+        "teammate:x:1000:1000:teammate:/home/teammate:/bin/bash\n"
         "nobody:x:65534:65534:nobody:/:/sbin/nologin\n"
     ).encode("utf-8")
     cpio.add_file("etc/passwd", passwd_content, mode=0o644)
@@ -399,33 +401,37 @@ def configure_tmux_dojo_rootfs(cpio: CpioArchiveBuilder):
         "disk:x:6:root\n"
         "wheel:x:10:root\n"
         "utmp:x:22:\n"
+        "devops:x:1000:root,teammate\n"
         "nobody:x:65534:\n"
     ).encode("utf-8")
     cpio.add_file("etc/group", group_content, mode=0o644)
 
-    shadow_content = b"root::19000:0:99999:7:::\nnobody:!::0:::::\n"
+    shadow_content = b"root::19000:0:99999:7:::\nteammate::19000:0:99999:7:::\nnobody:!::0:::::\n"
     cpio.add_file("etc/shadow", shadow_content, mode=0o600)
 
-    # 3. Root bash profile and clean prompt `dojo:~# `
+    # 3. Root & teammate bash profiles and clean prompt `dojo:~# `
     bashrc_content = (
         "export TERM=xterm-256color\n"
-        "export HOME=/root\n"
-        "export USER=root\n"
-        "export LOGNAME=root\n"
         "export EDITOR=nano\n"
         "export LANG=C.UTF-8\n"
-        "export PS1='dojo:\\w# '\n"
+        "if [ \"$(id -u)\" = \"0\" ]; then\n"
+        "    export PS1='dojo:\\w# '\n"
+        "else\n"
+        "    export PS1='teammate@dojo:\\w$ '\n"
+        "fi\n"
         "alias ls='ls --color=auto'\n"
         "alias ll='ls -la --color=auto'\n"
     ).encode("utf-8")
     cpio.add_file("root/.bashrc", bashrc_content, mode=0o644)
+    cpio.add_file("home/teammate/.bashrc", bashrc_content, mode=0o644, uid=1000, gid=1000)
 
     bash_profile_content = (
-        "if [ -f /root/.bashrc ]; then\n"
-        "    . /root/.bashrc\n"
+        "if [ -f ~/.bashrc ]; then\n"
+        "    . ~/.bashrc\n"
         "fi\n"
     ).encode("utf-8")
     cpio.add_file("root/.bash_profile", bash_profile_content, mode=0o644)
+    cpio.add_file("home/teammate/.bash_profile", bash_profile_content, mode=0o644, uid=1000, gid=1000)
     cpio.add_file("etc/profile", bashrc_content, mode=0o644)
 
     # Sample starter files in /root for practicing tmux & nano

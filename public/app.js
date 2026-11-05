@@ -795,6 +795,9 @@ class TmuxDojoApp {
 
         try {
             await this.inspector.syncTerminalSize(this.term.cols, this.term.rows);
+            await this.inspector.exec(
+                "id teammate >/dev/null 2>&1 || (addgroup devops 2>/dev/null || true; adduser -D -G devops -s /bin/bash teammate 2>/dev/null || true)"
+            );
         } catch (err) {
             console.warn("Initial ttyS0 size sync failed:", err);
         }

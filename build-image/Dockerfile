@@ -18,9 +18,12 @@ RUN apk update && apk add --no-cache \
 RUN echo "tmux-dojo" > /etc/hostname && \
     echo "127.0.0.1 localhost tmux-dojo" > /etc/hosts
 
-# Set bash as default shell for root
+# Set bash as default shell for root and create group `devops` + non-root user `teammate`
 RUN sed -i 's|^root:x:0:0:root:/root:/bin/ash|root:x:0:0:root:/root:/bin/bash|' /etc/passwd && \
-    sed -i 's|^root:x:0:0:root:/root:/bin/sh|root:x:0:0:root:/root:/bin/bash|' /etc/passwd
+    sed -i 's|^root:x:0:0:root:/root:/bin/sh|root:x:0:0:root:/root:/bin/bash|' /etc/passwd && \
+    addgroup -g 1000 devops && \
+    adduser -D -u 1000 -G devops -s /bin/bash teammate && \
+    addgroup root devops
 
 # Configure clean bash prompt and environment for root
 RUN cat << 'EOF' > /root/.bashrc

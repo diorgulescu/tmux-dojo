@@ -181,6 +181,12 @@ body {
     color: #fde68a;
 }
 
+.belt-badge.belt-red {
+    background-color: rgba(239, 68, 68, 0.18);
+    border-color: #ef4444;
+    color: #fecaca;
+}
+
 .belt-badge.belt-black {
     background-color: #05080d;
     border-color: var(--accent-cyan);
@@ -637,6 +643,7 @@ kbd {
 .belt-dot-green { background-color: #22c55e; }
 .belt-dot-blue { background-color: #3b82f6; }
 .belt-dot-brown { background-color: #b45309; }
+.belt-dot-red { background-color: #ef4444; }
 .belt-dot-black { background-color: #38bdf8; }
 
 .kata-sandbox-extras {

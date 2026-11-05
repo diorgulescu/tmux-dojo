@@ -87,7 +87,8 @@ const TMUX_DOJO_KATAS = [
                 checkCmd: 'tmux has-session -t dojo 2>/dev/null && echo OK',
                 autoSolveCmd: 'tmux has-session -t dojo 2>/dev/null || tmux new-session -d -s dojo',
                 autoSteps: [
-                    { type: "ttyS0", data: "tmux new -s dojo\n" }
+                    { type: "ttyS0", data: "tmux new -s dojo\n" },
+                    { type: "ttyS1", cmd: "tmux has-session -t dojo 2>/dev/null || tmux new-session -d -s dojo" }
                 ]
             },
             {
@@ -458,11 +459,95 @@ const TMUX_DOJO_KATAS = [
     },
 
     // ========================================================================
-    // ⬛ KATA 7: BLACK BELT (2 Tasks + Master Cheat Sheet + Sensei Config Injector)
+    // 🟥 KATA 7: RED BELT (5 Tasks — Shared Sockets & Multi-User Pair Debugging)
     // ========================================================================
     {
-        id: "kata-7-mastery",
+        id: "kata-7-multiuser",
         number: "KATA 07",
+        belt: "Red Belt",
+        beltColor: "red",
+        title: "War Room & Pair Debugging (Shared Sockets & Multi-User)",
+        theory: `
+            <p>
+                By default, <code>tmux</code> creates its UNIX socket inside <code>/tmp/tmux-&lt;UID&gt;/default</code>, locked strictly to your own user account.
+                During live incident response ("war rooms") or pair programming on a shared remote server, you can launch a
+                <code>tmux</code> server on an explicit <strong>shared UNIX socket</strong> using <code>-S /tmp/pair.sock</code>.
+            </p>
+            <div class="theory-callout">
+                <div class="theory-callout-title">Multi-User Collaboration Primitives</div>
+                <ul class="theory-keylist">
+                    <li><span><code>tmux -S /tmp/pair.sock new -s warroom</code></span> <span>Create session on an explicit socket path</span></li>
+                    <li><span><code>chgrp devops /tmp/pair.sock &amp;&amp; chmod 770 /tmp/pair.sock</code></span> <span>Grant socket access to a shared team group (or <code>chmod 777</code> in lab containers)</span></li>
+                    <li><span><code>tmux -S /tmp/pair.sock attach -t warroom -r</code></span> <span>Attach in <strong>Read-Only Spectator Mode</strong> (keystrokes won't interrupt the driver)</span></li>
+                    <li><span><code>tmux -S /tmp/pair.sock new-session -t warroom -s my-view</code></span> <span>Create an <strong>Independent Grouped Session</strong> (share windows without fighting over active window focus)</span></li>
+                </ul>
+            </div>
+        `,
+        tasks: [
+            {
+                id: "k7-t1-shared-socket",
+                description: "<strong>Create a Dedicated Shared Socket (<code>-S</code>):</strong> Start a new detached session named <code>warroom</code> on a custom socket at <code>/tmp/pair.sock</code> (<code>tmux -S /tmp/pair.sock new -s warroom -d</code>).",
+                hint: "Run <code>tmux -S /tmp/pair.sock new -s warroom -d</code> in your shell. This creates the socket file <code>/tmp/pair.sock</code> and starts the <code>warroom</code> session.",
+                checkCmd: '[ -S /tmp/pair.sock ] && tmux -S /tmp/pair.sock has-session -t warroom 2>/dev/null && echo OK',
+                onPassCmd: 'tmux -S /tmp/pair.sock server-access -a teammate 2>/dev/null || true',
+                autoSolveCmd: 'tmux -S /tmp/pair.sock has-session -t warroom 2>/dev/null || tmux -S /tmp/pair.sock new-session -d -s warroom'
+            },
+            {
+                id: "k7-t2-socket-perms",
+                description: "<strong>Unlock Socket Permissions for Your Team (<code>chmod</code> / <code>chgrp</code>):</strong> Grant group/world read-write-execute permissions to <code>/tmp/pair.sock</code> (<code>chmod 777 /tmp/pair.sock</code> or <code>chgrp devops /tmp/pair.sock &amp;&amp; chmod 770 /tmp/pair.sock</code>) so user <code>teammate</code> can connect.",
+                hint: "Run <code>chmod 777 /tmp/pair.sock</code> (or <code>chgrp devops /tmp/pair.sock &amp;&amp; chmod 770 /tmp/pair.sock</code>) so non-root user <code>teammate</code> can access the socket.",
+                checkCmd: 'tmux -S /tmp/pair.sock server-access -a teammate 2>/dev/null || true; su - teammate -c "tmux -S /tmp/pair.sock list-sessions" >/dev/null 2>&1 && echo OK',
+                autoSolveCmd: 'chgrp devops /tmp/pair.sock 2>/dev/null || true; chmod 777 /tmp/pair.sock'
+            },
+            {
+                id: "k7-t3-attach-readonly",
+                description: "<strong>Attach in Read-Only / Spectator Mode (<code>-r</code>):</strong> Attach to the <code>warroom</code> session on <code>/tmp/pair.sock</code> in <strong>Read-Only mode</strong> (<code>tmux -S /tmp/pair.sock attach -t warroom -r</code>). <em>(If you are currently inside another tmux session, detach first with <kbd>Ctrl+b</kbd> <kbd>d</kbd>.)</em>",
+                hint: "If you are inside an existing tmux session, press <kbd>Ctrl+b</kbd> <kbd>d</kbd> to return to the host shell first, then run <code>tmux -S /tmp/pair.sock attach -t warroom -r</code>.",
+                checkCmd: 'tmux -S /tmp/pair.sock list-clients -F "#{client_readonly}" 2>/dev/null | grep -qx "1" && echo OK',
+                autoSteps: [
+                    {
+                        type: "ttyS1",
+                        cmd: 'tmux detach-client 2>/dev/null || true; tmux -S /tmp/pair.sock detach-client 2>/dev/null || true'
+                    },
+                    {
+                        type: "ttyS0",
+                        data: "tmux -S /tmp/pair.sock attach -t warroom -r\n"
+                    }
+                ]
+            },
+            {
+                id: "k7-t4-pair-readwrite",
+                description: "<strong>Simulate Live Pair-Debugging (Switch to Full Access &amp; Receive Teammate Input):</strong> Detach (<kbd>Ctrl+b</kbd> <kbd>d</kbd>) and re-attach to <code>warroom</code> on <code>/tmp/pair.sock</code> in normal read-write mode without <code>-r</code> (<code>tmux -S /tmp/pair.sock attach -t warroom</code>). Watch your colleague <code>teammate</code> type a live message into your shared terminal!",
+                hint: "Press <kbd>Ctrl+b</kbd> then <kbd>d</kbd> to detach from read-only mode, then run <code>tmux -S /tmp/pair.sock attach -t warroom</code>.",
+                checkCmd: 'tmux -S /tmp/pair.sock list-clients -F "#{client_readonly}" 2>/dev/null | grep -qx "0" && echo OK',
+                onPassCmd: 'tmux -S /tmp/pair.sock server-access -a teammate 2>/dev/null || true; su - teammate -c "tmux -S /tmp/pair.sock send-keys -t warroom \'# 👋 Hey from teammate! I am connected to /tmp/pair.sock!\' C-m"',
+                autoSteps: [
+                    {
+                        type: "ttyS1",
+                        cmd: 'tmux -S /tmp/pair.sock detach-client -s warroom 2>/dev/null || true'
+                    },
+                    {
+                        type: "ttyS0",
+                        data: "tmux -S /tmp/pair.sock attach -t warroom\n"
+                    }
+                ]
+            },
+            {
+                id: "k7-t5-grouped-session",
+                description: "<strong>Grouped Sessions — Independent Window Focus (<code>new-session -t</code>):</strong> Create a grouped session named <code>my-view</code> linked to the <code>warroom</code> session on <code>/tmp/pair.sock</code> so both engineers share windows without dragging each other's active window focus (<code>tmux -S /tmp/pair.sock new -t warroom -s my-view -d</code>).",
+                hint: "Run <code>tmux -S /tmp/pair.sock new -t warroom -s my-view -d</code> (either inside your shell pane or from outside tmux).",
+                checkCmd: 'tmux -S /tmp/pair.sock list-sessions -F "#{session_name}:#{session_group}" 2>/dev/null | grep -E "^my-view:.+" && echo OK',
+                autoSolveCmd: 'tmux -S /tmp/pair.sock has-session -t my-view 2>/dev/null || tmux -S /tmp/pair.sock new-session -d -t warroom -s my-view'
+            }
+        ]
+    },
+
+    // ========================================================================
+    // ⬛ KATA 8: BLACK BELT (2 Tasks + Master Cheat Sheet + Sensei Config Injector)
+    // ========================================================================
+    {
+        id: "kata-8-mastery",
+        number: "KATA 08",
         belt: "Black Belt",
         beltColor: "black",
         title: "Automation, Status Bar Styling & Sandbox (Mastery)",
@@ -484,14 +569,14 @@ const TMUX_DOJO_KATAS = [
         `,
         tasks: [
             {
-                id: "k7-t1-status-style",
+                id: "k8-t1-status-style",
                 description: "<strong>Customize the Status Bar Style:</strong> Configure your status bar colors by adding <code>set -g status-style bg=black,fg=green</code> to <code>~/.tmux.conf</code> and reloading (<code>tmux source-file ~/.tmux.conf</code>).",
                 hint: "Run <code>echo 'set -g status-style bg=black,fg=green' &gt;&gt; ~/.tmux.conf &amp;&amp; tmux source-file ~/.tmux.conf</code> (or use the Config Editor tab).",
-                checkCmd: 'tmux show-options -g status-style 2>/dev/null | grep -q "bg=black" && echo OK',
-                autoSolveCmd: 'tmux has-session 2>/dev/null || tmux new-session -d -s dojo; grep -q "status-style bg=black,fg=green" ~/.tmux.conf 2>/dev/null || echo "set -g status-style bg=black,fg=green" >> ~/.tmux.conf; tmux source-file ~/.tmux.conf'
+                checkCmd: '(tmux show-options -g status-style 2>/dev/null; tmux -S /tmp/pair.sock show-options -g status-style 2>/dev/null) | grep -q "bg=black" && echo OK',
+                autoSolveCmd: 'tmux has-session 2>/dev/null || tmux new-session -d -s dojo; grep -q "status-style bg=black,fg=green" ~/.tmux.conf 2>/dev/null || echo "set -g status-style bg=black,fg=green" >> ~/.tmux.conf; tmux source-file ~/.tmux.conf 2>/dev/null || true; tmux -S /tmp/pair.sock source-file ~/.tmux.conf 2>/dev/null || true'
             },
             {
-                id: "k7-t2-script-workspace",
+                id: "k8-t2-script-workspace",
                 description: "<strong>Script an Automated Project Workspace:</strong> Write an executable script <code>/root/start-dev.sh</code> (or run a one-liner) that programmatically spins up a detached session named <code>prod</code> with a window named <code>monitor</code> and splits it into 2 panes (<code>tmux new-session -d -s prod -n monitor \\; split-window -h</code>).",
                 hint: "Run <code>tmux new-session -d -s prod -n monitor \\; split-window -h</code> in your shell (or save it into <code>/root/start-dev.sh</code> and run <code>sh /root/start-dev.sh</code>).",
                 checkCmd: 'tmux has-session -t prod 2>/dev/null && tmux list-windows -t prod -F "#{window_name}" | grep -qx "monitor" && [ $(tmux list-panes -t prod:monitor 2>/dev/null | wc -l) -eq 2 ] && echo OK',
@@ -556,6 +641,16 @@ const TMUX_DOJO_KATAS = [
                         <li><span><kbd>Ctrl+b</kbd> <kbd>:</kbd></span> <span>Open internal tmux command prompt</span></li>
                         <li><span><code>:setw synchronize-panes on</code></span> <span>Broadcast typing to all panes in window</span></li>
                         <li><span><kbd>Ctrl+b</kbd> <kbd>?</kbd></span> <span>List all active keybindings</span></li>
+                    </ul>
+                </div>
+
+                <div class="cheatsheet-section">
+                    <h4>Multi-User / Shared Socket (<code>-S</code>)</h4>
+                    <ul class="theory-keylist">
+                        <li><span><code>tmux -S /tmp/shared.sock new -s warroom</code></span> <span>Create session on shared socket path</span></li>
+                        <li><span><code>chgrp devops /tmp/shared.sock &amp;&amp; chmod 770 /tmp/shared.sock</code></span> <span>Grant team group access to socket</span></li>
+                        <li><span><code>tmux -S /tmp/shared.sock attach -t warroom -r</code></span> <span>Attach in Read-Only spectator mode</span></li>
+                        <li><span><code>tmux -S /tmp/shared.sock new-session -t warroom -s view2</code></span> <span>Grouped session with independent window focus</span></li>
                     </ul>
                 </div>
             </div>

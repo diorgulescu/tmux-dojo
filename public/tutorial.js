@@ -191,6 +191,12 @@ class TutorialEngine {
         this.hintVisible = false;
         this._saveState();
         this.render(task.id);
+
+        // Execute any bonus side-effect command on ttyS1 when a task passes
+        // (e.g., teammate sending a live greeting message into /tmp/pair.sock in Kata 7 Task 4)
+        if (task.onPassCmd && this.app && this.app.isVmReady && this.app.inspector) {
+            this.app.inspector.exec(task.onPassCmd, 5000).catch(() => {});
+        }
     }
 
     /**
