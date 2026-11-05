@@ -153,12 +153,13 @@ class VmInspector {
         this.emulator = emulator;
         this.onStatusChange = onStatusChange;
         this.encoder = new TextEncoder();
+        this.decoder = new TextDecoder("utf-8");
         this.buffer = "";
         this.queue = [];
         this.currentTask = null;
 
-        this._boundOnChar = (ch) => this._handleOutputChar(ch);
-        this.emulator.add_listener("serial1-output-char", this._boundOnChar);
+        this._boundOnByte = (byte) => this._handleOutputChar(this.decoder.decode(Uint8Array.of(byte), { stream: true }));
+        this.emulator.add_listener("serial1-output-byte", this._boundOnByte);
     }
 
     /**
@@ -756,12 +757,13 @@ class TmuxDojoApp {
         });
         window.vmInspector = this.inspector;
 
-        // Connect ttyS0 output (serial-output-char) directly to xterm.js
-        this.emulator.add_listener("serial-output-char", (ch) => {
-            this.term.write(ch);
+        // Connect ttyS0 output bytes (serial0-output-byte) directly to xterm.js as raw Uint8Array
+        // so multi-byte UTF-8 box-drawing characters (│, ─, ┼, etc.) decode properly instead of Latin-1 mojibake
+        this.emulator.add_listener("serial0-output-byte", (byte) => {
+            this.term.write(Uint8Array.of(byte));
 
             if (!this.isVmReady) {
-                this.bootOutputBuffer += ch;
+                this.bootOutputBuffer += String.fromCharCode(byte);
                 if (this.bootOutputBuffer.includes("dojo:~#")) {
                     this._onVmBootReady();
                 }
