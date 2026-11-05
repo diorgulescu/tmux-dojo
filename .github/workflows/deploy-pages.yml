@@ -1,0 +1,55 @@
+# Deploy tmux-dojo (/public) to GitHub Pages
+# Copyright (C) 2026 Dragoş Iorgulescu
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: Deploy tmux-dojo to GitHub Pages
+
+on:
+  push:
+    branches: ["main", "master"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Verify or generate VM assets & instant-boot snapshot
+        run: |
+          if [ ! -f public/v86/bzImage ] || [ ! -f public/v86/initramfs.cpio.gz ]; then
+            ./build-image/build.sh
+          elif [ ! -f public/v86/initial_state.bin ]; then
+            node ./build-image/generate_snapshot.js
+          fi
+          touch public/.nojekyll
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload static site artifact (/public)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "./public"
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

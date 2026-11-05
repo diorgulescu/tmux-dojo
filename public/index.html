@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<!--
+  tmux-dojo — Interactive Client-Side tmux Tutorial
+  Copyright (C) 2026 Dragoş Iorgulescu
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tmux-dojo — Interactive Client-Side tmux Tutorial</title>
+    <link rel="stylesheet" href="vendor/xterm.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div id="dojo-layout" class="dojo-layout">
+        <!-- 35% Left Sidebar: Dojo Katas & Lessons -->
+        <aside id="kata-sidebar" class="kata-sidebar" aria-label="Dojo Katas and Lessons">
+            <header class="sidebar-header">
+                <div class="brand-lockup">
+                    <span class="brand-glyph" aria-hidden="true">⌘</span>
+                    <div>
+                        <h1 class="brand-title">tmux-dojo</h1>
+                        <p class="brand-subtitle">Interactive Terminal Multiplexer Training</p>
+                    </div>
+                </div>
+                <span class="belt-badge belt-white" id="belt-badge">White Belt</span>
+            </header>
+
+            <div class="kata-progress-bar" aria-label="Lesson Progress">
+                <div class="kata-progress-fill" id="kata-progress-fill" style="width: 20%"></div>
+            </div>
+
+            <div class="kata-content" id="kata-content">
+                <!-- Populated dynamically by TutorialEngine (tutorial.js) -->
+            </div>
+
+            <footer class="sidebar-footer">
+                <div class="telemetry-readout">
+                    <span class="telemetry-dot" id="telemetry-dot"></span>
+                    <span id="telemetry-summary">ttyS1 Telemetry: Idle</span>
+                </div>
+                <div class="footer-right-meta">
+                    <a href="LICENSE" target="_blank" rel="noopener noreferrer" class="gpl-license-link" title="Licensed under the GNU General Public License v3.0">GPLv3</a>
+                    <span class="dimensions-readout" id="dimensions-readout">80 × 24</span>
+                </div>
+            </footer>
+        </aside>
+
+        <!-- 65% Right Area: Top Status Bar + Workspace Tabs + Terminal / ~/.tmux.conf Editor -->
+        <main class="terminal-workspace">
+            <header class="terminal-topbar">
+                <div class="topbar-left">
+                    <div class="topbar-brand">
+                        <span class="topbar-prompt">&gt;_</span>
+                        <span class="topbar-name">tmux-dojo</span>
+                    </div>
+
+                    <div id="vm-status-badge" class="vm-status-badge status-booting" role="status" aria-live="polite">
+                        <span class="status-indicator"></span>
+                        <span id="vm-status-text">Booting</span>
+                    </div>
+
+                    <!-- Workspace View Switcher: [ Terminal (ttyS0) ] | [ ~/.tmux.conf Editor ] -->
+                    <div class="workspace-tab-switcher" role="tablist" aria-label="Workspace View">
+                        <button
+                            id="tab-btn-terminal"
+                            class="workspace-tab-btn active"
+                            type="button"
+                            role="tab"
+                            aria-selected="true"
+                            aria-controls="panel-terminal"
+                        >
+                            [ Terminal (ttyS0) ]
+                        </button>
+                        <button
+                            id="tab-btn-config"
+                            class="workspace-tab-btn"
+                            type="button"
+                            role="tab"
+                            aria-selected="false"
+                            aria-controls="panel-config"
+                        >
+                            [ ~/.tmux.conf Editor ]
+                        </button>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div id="keystroke-visualizer" class="keystroke-visualizer" title="Live tmux Prefix (Ctrl+b) &amp; Command Visualizer">
+                        <span class="prefix-label" id="prefix-status-icon">⌨</span>
+                        <kbd class="prefix-kbd">Ctrl+b</kbd>
+                        <span id="last-key-chord" class="last-key-chord">Idle — Press Ctrl+b</span>
+                    </div>
+
+                    <button id="reset-vm-btn" class="reset-vm-btn" type="button" title="Restore or reboot the Alpine Linux VM from a clean state">
+                        <span class="reset-icon" aria-hidden="true">↺</span>
+                        <span>Reset Dojo (VM)</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Tab Panel 1: Interactive xterm.js Terminal (ttyS0) -->
+            <section id="panel-terminal" class="terminal-stage" role="tabpanel" aria-labelledby="tab-btn-terminal">
+                <div id="terminal-container" class="terminal-container" tabindex="0"></div>
+                <!-- Hidden v86 VGA container required internally by V86 -->
+                <div id="v86-screen-hidden" style="display: none;" aria-hidden="true">
+                    <div></div>
+                    <canvas></canvas>
+                </div>
+            </section>
+
+            <!-- Tab Panel 2: Interactive ~/.tmux.conf Inspector & Editor -->
+            <section id="panel-config" class="config-inspector-stage hidden" role="tabpanel" aria-labelledby="tab-btn-config">
+                <div class="config-toolbar">
+                    <div class="config-toolbar-info">
+                        <span class="config-filepath">/root/.tmux.conf</span>
+                        <span id="config-sync-status" class="config-sync-status">Synced via ttyS1</span>
+                    </div>
+                    <div class="config-toolbar-actions">
+                        <button id="reload-from-vm-btn" class="config-secondary-btn" type="button" title="Fetch current /root/.tmux.conf from the VM">
+                            ↻ Fetch from VM
+                        </button>
+                        <button id="load-sensei-template-btn" class="config-secondary-btn" type="button" title="Load Sensei's recommended configuration into editor">
+                            ⚡ Load Sensei Preset
+                        </button>
+                        <button id="save-reload-conf-btn" class="config-primary-btn" type="button">
+                            💾 Save &amp; Reload in tmux
+                        </button>
+                    </div>
+                </div>
+
+                <div class="config-split-panes">
+                    <div class="config-editor-pane">
+                        <label for="tmux-conf-textarea" class="pane-label">Editor (<code>/root/.tmux.conf</code>)</label>
+                        <textarea
+                            id="tmux-conf-textarea"
+                            class="tmux-conf-textarea"
+                            spellcheck="false"
+                            placeholder="# Write your ~/.tmux.conf settings here...&#10;set -g mouse on&#10;set -g base-index 1"
+                        ></textarea>
+                    </div>
+
+                    <div class="config-explainer-pane">
+                        <div class="pane-label">Live Setting Inspector (Line-by-Line Analysis)</div>
+                        <div id="tmux-conf-explanations" class="tmux-conf-explanations">
+                            <!-- Populated dynamically as the user views or edits ~/.tmux.conf -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="v86/libv86.js"></script>
+    <script src="vendor/xterm.js"></script>
+    <script src="vendor/addon-fit.js"></script>
+    <script src="lessons.js"></script>
+    <script src="app.js"></script>
+    <script src="tutorial.js"></script>
+</body>
+</html>

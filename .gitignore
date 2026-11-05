@@ -1,0 +1,5 @@
+# Cache downloaded Alpine Linux APK files during local builds
+build-image/.apk-cache/
+build-image/.rootfs-tmp/
+.DS_Store
+node_modules/

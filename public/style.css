@@ -1,0 +1,1337 @@
+/*
+ * tmux-dojo — High-Contrast Dark Terminal Stylesheet
+ * Copyright (C) 2026 Dragoş Iorgulescu
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+
+:root {
+    --bg-deep: #090d14;
+    --bg-sidebar: #0e141f;
+    --bg-topbar: #0b1019;
+    --bg-card: #131c2b;
+    --bg-card-elevated: #182336;
+    --bg-terminal: #090d14;
+
+    --border-subtle: #1f2b3e;
+    --border-strong: #2d3f5b;
+
+    --text-primary: #eef4fc;
+    --text-secondary: #9fb0c7;
+    --text-muted: #647792;
+
+    --accent-green: #22c55e;
+    --accent-green-glow: rgba(34, 197, 94, 0.25);
+    --accent-amber: #f59e0b;
+    --accent-amber-glow: rgba(245, 158, 11, 0.25);
+    --accent-cyan: #38bdf8;
+    --accent-cyan-glow: rgba(56, 189, 248, 0.28);
+    --accent-danger: #ef4444;
+
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+    --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--bg-deep);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Main 35% / 65% Split-Screen Layout */
+.dojo-layout {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.kata-sidebar {
+    width: 35%;
+    min-width: 320px;
+    max-width: 560px;
+    height: 100%;
+    background-color: var(--bg-sidebar);
+    border-right: 1px solid var(--border-subtle);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    user-select: none;
+}
+
+.terminal-workspace {
+    width: 65%;
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-terminal);
+    overflow: hidden;
+}
+
+/* Sidebar Header & Katas */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-subtle);
+    background-color: var(--bg-topbar);
+}
+
+.brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(56, 189, 248, 0.15));
+    border: 1px solid rgba(34, 197, 94, 0.45);
+    color: var(--accent-green);
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.brand-title {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+}
+
+.brand-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.belt-badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background-color: rgba(238, 244, 252, 0.08);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    transition: all 0.25s ease;
+}
+
+.belt-badge.belt-white {
+    background-color: rgba(238, 244, 252, 0.1);
+    border-color: #cbd5e1;
+    color: #f8fafc;
+}
+
+.belt-badge.belt-yellow {
+    background-color: rgba(245, 158, 11, 0.15);
+    border-color: var(--accent-amber);
+    color: #fde68a;
+}
+
+.belt-badge.belt-green {
+    background-color: rgba(34, 197, 94, 0.15);
+    border-color: var(--accent-green);
+    color: #86efac;
+}
+
+.belt-badge.belt-brown {
+    background-color: rgba(180, 83, 9, 0.22);
+    border-color: #d97706;
+    color: #fed7aa;
+}
+
+.belt-badge.belt-black {
+    background-color: #05080d;
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+    box-shadow: 0 0 10px var(--accent-cyan-glow);
+}
+
+.kata-progress-bar {
+    width: 100%;
+    height: 3px;
+    background-color: var(--border-subtle);
+    overflow: hidden;
+}
+
+.kata-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan));
+    transition: width 0.3s ease;
+}
+
+.kata-content {
+    flex: 1;
+    padding: 22px 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.kata-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.kata-number {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent-cyan);
+}
+
+.kata-status-pill {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background-color: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: var(--accent-cyan);
+}
+
+.kata-title {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--text-primary);
+}
+
+.kata-description {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.kata-description code,
+.objective-body code,
+.shortcut-desc code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background-color: var(--bg-card-elevated);
+    border: 1px solid var(--border-subtle);
+    color: var(--accent-green);
+}
+
+.kata-objective-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-left: 3px solid var(--accent-green);
+    border-radius: 8px;
+    padding: 14px 16px;
+}
+
+.objective-header {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent-green);
+    margin-bottom: 6px;
+}
+
+.objective-body {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text-primary);
+}
+
+.cheat-sheet-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 14px 16px;
+}
+
+.cheat-sheet-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.shortcut-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.shortcut-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 13px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed rgba(45, 63, 91, 0.45);
+}
+
+.shortcut-list li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.shortcut-keys {
+    white-space: nowrap;
+}
+
+.shortcut-desc {
+    color: var(--text-secondary);
+    text-align: right;
+}
+
+kbd {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.2;
+    padding: 3px 6px;
+    border-radius: 4px;
+    background-color: var(--bg-card-elevated);
+    border: 1px solid var(--border-strong);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+    color: var(--text-primary);
+}
+
+.sidebar-footer {
+    padding: 10px 20px;
+    border-top: 1px solid var(--border-subtle);
+    background-color: var(--bg-topbar);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.telemetry-readout {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.telemetry-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: var(--text-muted);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.telemetry-dot.active {
+    background-color: var(--accent-cyan);
+    box-shadow: 0 0 8px var(--accent-cyan);
+}
+
+/* Right Area: Top Status Bar */
+.terminal-topbar {
+    height: 54px;
+    min-height: 54px;
+    padding: 0 16px;
+    background-color: var(--bg-topbar);
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    user-select: none;
+}
+
+.topbar-left,
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+}
+
+.topbar-prompt {
+    color: var(--accent-green);
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.topbar-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.topbar-arch {
+    font-size: 11px;
+    color: var(--text-muted);
+    padding: 2px 7px;
+    border-radius: 4px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+}
+
+/* VM Status Badge (Booting / Ready) */
+.vm-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    transition: all 0.25s ease;
+}
+
+.vm-status-badge .status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.vm-status-badge.status-booting {
+    background-color: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.45);
+    color: var(--accent-amber);
+}
+
+.vm-status-badge.status-booting .status-indicator {
+    background-color: var(--accent-amber);
+    box-shadow: 0 0 8px var(--accent-amber-glow);
+    animation: pulse-amber 1.2s infinite ease-in-out;
+}
+
+.vm-status-badge.status-ready {
+    background-color: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.45);
+    color: var(--accent-green);
+}
+
+.vm-status-badge.status-ready .status-indicator {
+    background-color: var(--accent-green);
+    box-shadow: 0 0 8px var(--accent-green-glow);
+}
+
+@keyframes pulse-amber {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.45; transform: scale(0.85); }
+}
+
+/* Live Keystroke Visualizer Badge */
+.keystroke-visualizer {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 11px;
+    border-radius: 6px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    transition: all 0.16s ease;
+}
+
+.keystroke-visualizer .prefix-label {
+    color: var(--text-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.keystroke-visualizer .prefix-kbd {
+    transition: all 0.16s ease;
+}
+
+.keystroke-visualizer .last-key-chord {
+    color: var(--text-secondary);
+    min-width: 78px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.keystroke-visualizer.prefix-active {
+    background-color: rgba(34, 197, 94, 0.18);
+    border-color: var(--accent-green);
+    box-shadow: 0 0 14px var(--accent-green-glow);
+}
+
+.keystroke-visualizer.prefix-active .prefix-kbd {
+    background-color: var(--accent-green);
+    border-color: var(--accent-green);
+    color: #051b0c;
+}
+
+.keystroke-visualizer.prefix-active .last-key-chord {
+    color: var(--accent-green);
+}
+
+/* Reset Dojo (VM) Button */
+.reset-vm-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background-color: var(--bg-card-elevated);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.reset-vm-btn:hover {
+    background-color: rgba(239, 68, 68, 0.16);
+    border-color: var(--accent-danger);
+    color: #fecaca;
+}
+
+.reset-vm-btn:active {
+    transform: translateY(1px);
+}
+
+/* Terminal Stage & xterm.js Container */
+.terminal-stage {
+    flex: 1;
+    width: 100%;
+    height: calc(100% - 54px);
+    padding: 8px 10px;
+    background-color: var(--bg-terminal);
+    display: flex;
+    overflow: hidden;
+    position: relative;
+}
+
+.terminal-container {
+    width: 100%;
+    height: 100%;
+    outline: none;
+    overflow: hidden;
+}
+
+.terminal-container .xterm {
+    width: 100%;
+    height: 100%;
+}
+
+/* ============================================================================
+   Phase 3: Interactive Kata Engine & Curriculum Styles
+   ============================================================================ */
+
+.kata-switcher {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.kata-tabs-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.kata-nav-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.kata-nav-tab:hover {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+}
+
+.kata-nav-tab.active {
+    background-color: var(--bg-card-elevated);
+    border-color: var(--accent-cyan);
+    color: var(--text-primary);
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.16);
+}
+
+.kata-nav-tab.completed {
+    border-color: rgba(34, 197, 94, 0.45);
+}
+
+.tab-belt-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+.belt-dot-white { background-color: #f8fafc; }
+.belt-dot-yellow { background-color: #f59e0b; }
+.belt-dot-green { background-color: #22c55e; }
+.belt-dot-brown { background-color: #d97706; }
+.belt-dot-black { background-color: #38bdf8; }
+
+.tab-check {
+    color: var(--accent-green);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.overall-progress-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.kata-status-pill.pill-complete {
+    background-color: rgba(34, 197, 94, 0.15);
+    border-color: rgba(34, 197, 94, 0.45);
+    color: var(--accent-green);
+}
+
+/* Theory Content Formatting */
+.kata-theory {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.kata-theory p strong,
+.kata-theory li strong {
+    color: var(--text-primary);
+}
+
+.kata-theory code,
+.task-item-desc code,
+.sensei-hint-box code {
+    font-family: var(--font-mono);
+    font-size: 0.92em;
+    padding: 2px 5px;
+    border-radius: 4px;
+    background-color: var(--bg-card-elevated);
+    border: 1px solid var(--border-subtle);
+    color: var(--accent-green);
+}
+
+.theory-callout {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.theory-callout-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-cyan);
+}
+
+.theory-steps {
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: var(--text-primary);
+    font-size: 13px;
+}
+
+.theory-bullets {
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.theory-keylist {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.theory-keylist li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 12.5px;
+    padding-bottom: 5px;
+    border-bottom: 1px dashed rgba(45, 63, 91, 0.4);
+}
+
+.theory-keylist li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* Interactive Tasks Checklist */
+.kata-tasks-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 2px;
+}
+
+.tasks-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+}
+
+.tasks-counter {
+    color: var(--accent-green);
+}
+
+.kata-tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.kata-task-item {
+    border-radius: 8px;
+    padding: 12px 14px;
+    border: 1px solid var(--border-subtle);
+    background-color: var(--bg-card);
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.kata-task-item.task-active {
+    border-color: var(--accent-cyan);
+    border-left: 3px solid var(--accent-cyan);
+    background-color: rgba(24, 35, 54, 0.9);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+}
+
+.kata-task-item.task-completed {
+    border-color: rgba(34, 197, 94, 0.35);
+    border-left: 3px solid var(--accent-green);
+    background-color: rgba(34, 197, 94, 0.06);
+}
+
+.kata-task-item.task-locked {
+    opacity: 0.52;
+}
+
+.kata-task-item.task-just-completed {
+    animation: task-complete-flash 0.65s ease;
+}
+
+@keyframes task-complete-flash {
+    0% { transform: scale(0.99); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6); }
+    50% { transform: scale(1.01); box-shadow: 0 0 18px 2px rgba(34, 197, 94, 0.35); }
+    100% { transform: scale(1); box-shadow: none; }
+}
+
+.task-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.task-active .task-step-badge {
+    color: var(--accent-cyan);
+}
+
+.task-completed .task-step-badge {
+    color: var(--accent-green);
+}
+
+.task-locked .task-step-badge {
+    color: var(--text-muted);
+}
+
+.task-live-probe {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.task-item-desc {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--text-primary);
+}
+
+.task-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+}
+
+.task-action-btn {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border-strong);
+    background-color: var(--bg-card-elevated);
+    color: var(--text-secondary);
+    transition: all 0.15s ease;
+}
+
+.task-action-btn:hover:not(:disabled) {
+    color: var(--text-primary);
+    border-color: var(--accent-cyan);
+}
+
+.task-action-btn.autocomplete-btn {
+    border-color: rgba(245, 158, 11, 0.45);
+    color: #fde68a;
+    background-color: rgba(245, 158, 11, 0.1);
+}
+
+.task-action-btn.autocomplete-btn:hover:not(:disabled) {
+    border-color: var(--accent-amber);
+    background-color: rgba(245, 158, 11, 0.2);
+}
+
+.task-action-btn:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+
+.sensei-hint-box {
+    margin-top: 4px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background-color: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    color: #fef3c7;
+    font-size: 12.5px;
+    line-height: 1.5;
+}
+
+/* Kata Complete Banner */
+.kata-complete-banner {
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.16), rgba(56, 189, 248, 0.12));
+    border: 1px solid rgba(34, 197, 94, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.complete-banner-text {
+    font-size: 13px;
+    color: var(--text-primary);
+}
+
+.next-kata-btn {
+    align-self: flex-start;
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--accent-green);
+    background-color: var(--accent-green);
+    color: #041d0c;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.next-kata-btn:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 0 12px var(--accent-green-glow);
+}
+
+/* Kata 5: Black Belt Sandbox & Master Cheat Sheet */
+.sandbox-action-box {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-left: 3px solid var(--accent-cyan);
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sandbox-action-desc {
+    font-size: 13px;
+    color: var(--text-primary);
+}
+
+.inject-sensei-btn {
+    padding: 9px 14px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.22), rgba(56, 189, 248, 0.22));
+    border: 1px solid var(--accent-cyan);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: center;
+}
+
+.inject-sensei-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.35), rgba(56, 189, 248, 0.35));
+    box-shadow: 0 0 14px var(--accent-cyan-glow);
+}
+
+.inject-sensei-feedback {
+    display: none;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--accent-green);
+    padding: 6px 8px;
+    border-radius: 4px;
+    background-color: rgba(34, 197, 94, 0.1);
+}
+
+.inject-sensei-feedback.visible {
+    display: block;
+}
+
+.master-cheatsheet {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cheatsheet-section {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.cheatsheet-section h4 {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-cyan);
+    margin-bottom: 8px;
+}
+
+/* Pagination Bar */
+.kata-pagination-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    margin-top: auto;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.kata-page-btn {
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.kata-page-btn:hover:not(:disabled) {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+}
+
+.kata-page-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.reset-progress-link {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.reset-progress-link:hover {
+    color: var(--accent-danger);
+}
+
+/* ============================================================================
+   Phase 4: Workspace Tab Switcher, Prefix Combo Visualizer & ~/.tmux.conf Editor
+   ============================================================================ */
+
+.hidden {
+    display: none !important;
+}
+
+.workspace-tab-switcher {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    padding: 2px;
+    gap: 2px;
+}
+
+.workspace-tab-btn {
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.workspace-tab-btn:hover {
+    color: var(--text-primary);
+}
+
+.workspace-tab-btn.active {
+    background-color: var(--bg-card-elevated);
+    color: var(--accent-cyan);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Enhanced Prefix & Combo Visualizer States */
+.keystroke-visualizer .last-key-chord {
+    min-width: 145px;
+    max-width: 440px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.keystroke-visualizer.combo-resolved {
+    background-color: rgba(56, 189, 248, 0.16);
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 14px var(--accent-cyan-glow);
+}
+
+.keystroke-visualizer.combo-resolved .prefix-kbd {
+    background-color: var(--accent-cyan);
+    border-color: var(--accent-cyan);
+    color: #04131f;
+}
+
+.keystroke-visualizer.combo-resolved .last-key-chord {
+    color: var(--accent-cyan);
+}
+
+/* ~/.tmux.conf Inspector / Editor Stage */
+.config-inspector-stage {
+    flex: 1;
+    width: 100%;
+    height: calc(100% - 54px);
+    background-color: var(--bg-deep);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.config-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 18px;
+    background-color: var(--bg-sidebar);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.config-toolbar-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-mono);
+}
+
+.config-filepath {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    padding: 3px 8px;
+    border-radius: 4px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+}
+
+.config-sync-status {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.config-sync-status.status-saved {
+    color: var(--accent-green);
+}
+
+.config-sync-status.status-unsaved {
+    color: var(--accent-amber);
+}
+
+.config-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.config-secondary-btn,
+.config-primary-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.config-secondary-btn {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    color: var(--text-secondary);
+}
+
+.config-secondary-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--accent-cyan);
+}
+
+.config-primary-btn {
+    background-color: var(--accent-green);
+    border: 1px solid var(--accent-green);
+    color: #041d0c;
+    font-weight: 700;
+}
+
+.config-primary-btn:hover:not(:disabled) {
+    filter: brightness(1.08);
+    box-shadow: 0 0 12px var(--accent-green-glow);
+}
+
+.config-primary-btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.config-split-panes {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 16px 18px;
+    overflow: hidden;
+}
+
+.config-editor-pane,
+.config-explainer-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 100%;
+    overflow: hidden;
+}
+
+.pane-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+}
+
+.tmux-conf-textarea {
+    flex: 1;
+    width: 100%;
+    resize: none;
+    padding: 14px;
+    border-radius: 8px;
+    background-color: var(--bg-topbar);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.55;
+    outline: none;
+}
+
+.tmux-conf-textarea:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.18);
+}
+
+.tmux-conf-explanations {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-right: 4px;
+}
+
+.conf-explanation-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-left: 3px solid var(--accent-cyan);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.conf-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 700;
+}
+
+.conf-line-badge {
+    color: var(--text-muted);
+}
+
+.conf-category-badge {
+    color: var(--accent-cyan);
+    padding: 1px 6px;
+    border-radius: 4px;
+    background-color: rgba(56, 189, 248, 0.12);
+}
+
+.conf-directive-code {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--accent-green);
+    background-color: var(--bg-topbar);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border-subtle);
+    word-break: break-all;
+}
+
+.conf-directive-summary {
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.conf-empty-state {
+    background-color: var(--bg-card);
+    border: 1px dashed var(--border-strong);
+    border-radius: 8px;
+    padding: 20px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.footer-right-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.gpl-license-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid var(--border-subtle);
+    transition: all 0.15s ease;
+}
+
+.gpl-license-link:hover {
+    color: var(--accent-cyan);
+    border-color: var(--accent-cyan);
+}
