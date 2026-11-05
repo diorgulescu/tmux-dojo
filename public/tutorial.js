@@ -212,16 +212,19 @@ class TutorialEngine {
         }
 
         try {
-            const steps = activeTask.autoSteps || [];
-            for (const step of steps) {
-                if (step.type === "ttyS0" && step.data) {
-                    const bytes = new TextEncoder().encode(step.data);
-                    for (let i = 0; i < bytes.length; i++) {
-                        this.app.emulator.bus.send("serial0-input", bytes[i]);
+            if (Array.isArray(activeTask.autoSteps) && activeTask.autoSteps.length > 0) {
+                for (const step of activeTask.autoSteps) {
+                    if (step.type === "ttyS0" && step.data) {
+                        const bytes = new TextEncoder().encode(step.data);
+                        for (let i = 0; i < bytes.length; i++) {
+                            this.app.emulator.bus.send("serial0-input", bytes[i]);
+                        }
+                    } else if (step.type === "ttyS1" && step.cmd) {
+                        await this.app.inspector.exec(step.cmd, 6000);
                     }
-                } else if (step.type === "ttyS1" && step.cmd) {
-                    await this.app.inspector.exec(step.cmd, 6000);
                 }
+            } else if (activeTask.autoSolveCmd) {
+                await this.app.inspector.exec(activeTask.autoSolveCmd, 6000);
             }
 
             // Wait briefly for the command to take effect, then run checkActiveTask
@@ -432,6 +435,8 @@ class TutorialEngine {
             </div>
 
             ${tasksSectionHtml}
+
+            ${kata.sandboxFooterHtml ? `<div class="kata-sandbox-extras">${kata.sandboxFooterHtml}</div>` : ""}
 
             <div class="kata-pagination-bar">
                 <button type="button" id="prev-kata-btn" class="kata-page-btn" ${prevDisabled}>← Prev Kata</button>

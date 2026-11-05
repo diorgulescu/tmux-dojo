@@ -13,12 +13,14 @@
   - **`ttyS1` (Silent Telemetry & Resize Bridge)**: Runs a background evaluation daemon (`/usr/local/bin/telemetry-daemon`). The browser's `VmInspector` sends shell probes and `stty -F /dev/ttyS0 rows <R> cols <C>` resize commands over `ttyS1` and parses responses wrapped in `___EVAL_START___` / `___EVAL_END___` markers without ever polluting the user's terminal on `ttyS0`.
 - **Live Prefix & Keystroke Combo Visualizer**: Highlights in the top bar when `Ctrl+b` is pressed (`🟢 PREFIX ACTIVE (Ctrl+b) — Awaiting command key...`) and displays the human-readable action for the follow-up key (e.g., `Ctrl+b % → Split Pane Vertically`).
 - **Interactive `~/.tmux.conf` Inspector & Editor Tab**: Switch between `[ Terminal (ttyS0) ]` and `[ ~/.tmux.conf Editor ]` to inspect `/root/.tmux.conf` with live line-by-line English explanations, edit directives, and one-click **Save & Reload in tmux** (via base64 over `ttyS1`).
-- **5-Belt Progressive Curriculum**:
-  1. **Kata 01 (White Belt)** — *Entering the Dojo (`Sessions`)*: Creating, detaching (`Ctrl+b d`), and re-attaching (`tmux attach -t dojo`) sessions.
-  2. **Kata 02 (Yellow Belt)** — *Blade Work (`Panes`)*: Vertical splits (`Ctrl+b %`), horizontal splits (`Ctrl+b "`), pane navigation, zoom (`Ctrl+b z`), and closing panes.
-  3. **Kata 03 (Green Belt)** — *Multiple Rooms (`Windows`)*: Creating (`Ctrl+b c`), switching, and renaming (`Ctrl+b ,`) windows.
-  4. **Kata 04 (Brown Belt)** — *Forging Your Weapon (`.tmux.conf`)*: Enabling mouse mode (`set -g mouse on`), 1-based window numbering (`set -g base-index 1`), and hot-reloading (`tmux source-file ~/.tmux.conf`).
-  5. **Kata 05 (Black Belt)** — *Free Sparring (`Sandbox & Mastery`)*: Full interactive cheat sheet and one-click injection of Sensei's production-ready `~/.tmux.conf`.
+- **7-Belt Progressive Curriculum (33 Auto-Verified Tasks)**:
+  1. **Kata 01 (White Belt)** — *Entering the Dojo (`Sessions & Client-Server`)*: Starting named sessions, renaming inside tmux (`Ctrl+b $`), detaching (`Ctrl+b d`), spawning detached sessions (`-d`), re-attaching, and switching sessions interactively (`Ctrl+b s`).
+  2. **Kata 02 (Yellow Belt)** — *Blade Work (`Panes & Spatial Control`)*: Vertical (`Ctrl+b %`) and horizontal (`Ctrl+b "`) splits, pane navigation, Monocle Zoom (`Ctrl+b z`), preset layout cycling (`Ctrl+b Space`), and closing panes.
+  3. **Kata 03 (Orange Belt)** — *Multiple Rooms (`Windows & Workflow Organization`)*: Creating (`Ctrl+b c`), renaming (`Ctrl+b ,`), switching windows (`Ctrl+b 0`), and breaking panes into standalone windows (`Ctrl+b !`).
+  4. **Kata 04 (Green Belt)** — *Scrollback, Copy Mode & Command Prompt (`Buffers`)*: Entering/exiting Copy Mode (`Ctrl+b [` / `q`), setting paste buffers, using the `Ctrl+b :` command prompt, and pasting buffers (`Ctrl+b ]`).
+  5. **Kata 05 (Blue Belt)** — *Advanced Multi-Pane Choreography (`Sync & Join`)*: Broadcasting keystrokes across multiple panes simultaneously with `setw synchronize-panes on/off`.
+  6. **Kata 06 (Brown Belt)** — *Forging Your Weapon (`~/.tmux.conf`)*: Mouse support, 1-based window/pane indexing, `|` and `-` split bindings, `Prefix + r` reload binding, and live config sourcing.
+  7. **Kata 07 (Black Belt)** — *Automation, Status Bar Styling & Sandbox (`Mastery`)*: Customizing `status-style`, scripting multi-pane workspaces (`/root/start-dev.sh`), interactive Master Cheat Sheet, and one-click Sensei `~/.tmux.conf` injection.
 
 ---
 

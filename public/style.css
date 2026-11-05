@@ -152,9 +152,15 @@ body {
 }
 
 .belt-badge.belt-yellow {
-    background-color: rgba(245, 158, 11, 0.15);
-    border-color: var(--accent-amber);
-    color: #fde68a;
+    background-color: rgba(250, 204, 21, 0.16);
+    border-color: #eab308;
+    color: #fef08a;
+}
+
+.belt-badge.belt-orange {
+    background-color: rgba(249, 115, 22, 0.18);
+    border-color: #f97316;
+    color: #fed7aa;
 }
 
 .belt-badge.belt-green {
@@ -163,10 +169,16 @@ body {
     color: #86efac;
 }
 
+.belt-badge.belt-blue {
+    background-color: rgba(59, 130, 246, 0.18);
+    border-color: #3b82f6;
+    color: #bfdbfe;
+}
+
 .belt-badge.belt-brown {
     background-color: rgba(180, 83, 9, 0.22);
-    border-color: #d97706;
-    color: #fed7aa;
+    border-color: #b45309;
+    color: #fde68a;
 }
 
 .belt-badge.belt-black {
@@ -577,20 +589,21 @@ kbd {
 .kata-tabs-group {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
+    flex-wrap: wrap;
 }
 
 .kata-nav-tab {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 5px 10px;
+    gap: 4px;
+    padding: 4px 8px;
     border-radius: 6px;
     background-color: var(--bg-card);
     border: 1px solid var(--border-subtle);
     color: var(--text-secondary);
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -619,10 +632,19 @@ kbd {
 }
 
 .belt-dot-white { background-color: #f8fafc; }
-.belt-dot-yellow { background-color: #f59e0b; }
+.belt-dot-yellow { background-color: #eab308; }
+.belt-dot-orange { background-color: #f97316; }
 .belt-dot-green { background-color: #22c55e; }
-.belt-dot-brown { background-color: #d97706; }
+.belt-dot-blue { background-color: #3b82f6; }
+.belt-dot-brown { background-color: #b45309; }
 .belt-dot-black { background-color: #38bdf8; }
+
+.kata-sandbox-extras {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 4px;
+}
 
 .tab-check {
     color: var(--accent-green);
